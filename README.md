@@ -2,6 +2,17 @@
 
 A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to house a complete Meshtastic communication node.
 
+## Preview
+
+### Assembled View
+![Assembled view of the Altoids Mesh enclosure](docs/images/assembled_view.png)
+
+### Exploded View
+![Exploded view showing all components separated](docs/images/exploded_view.png)
+
+### Print Layout
+![Print layout with parts arranged for 3D printing](docs/images/print_layout.png)
+
 ## Components
 
 | Component | Dimensions (mm) | Description |
