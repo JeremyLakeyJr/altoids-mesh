@@ -67,6 +67,36 @@ module mounting_standoff(height, hole_dia, outer_dia) {
     }
 }
 
+// ---- Hinge Knuckle (barrel with pin hole and support arm) ----
+// Places a single knuckle barrel at the given X position on the back edge.
+// arm_dir: +1 = arm extends toward +Y (lid), -1 = arm extends toward -Y (case)
+module hinge_knuckle(x_pos, knuckle_len, arm_dir) {
+    barrel_r = hinge_barrel_outer_dia / 2;
+    translate([x_pos, external_width, case_external_depth]) {
+        difference() {
+            union() {
+                // Barrel cylinder along X
+                rotate([0, 90, 0])
+                    cylinder(d = hinge_barrel_outer_dia, h = knuckle_len, $fn = 24);
+                // Support arm connecting barrel to wall
+                if (arm_dir < 0) {
+                    // Case arm: extends inward (-Y) and downward (-Z)
+                    translate([0, -hinge_arm_thickness, -barrel_r])
+                        cube([knuckle_len, hinge_arm_thickness, barrel_r]);
+                } else {
+                    // Lid arm: extends inward (+Y) toward lid body
+                    translate([0, 0, -barrel_r])
+                        cube([knuckle_len, hinge_arm_thickness, barrel_r]);
+                }
+            }
+            // Pin hole
+            translate([-0.1, 0, 0])
+                rotate([0, 90, 0])
+                cylinder(d = hinge_pin_dia + tolerance * 2, h = knuckle_len + 0.2, $fn = 24);
+        }
+    }
+}
+
 // ---- Main Bottom Case ----
 module bottom_case() {
     difference() {
@@ -171,6 +201,12 @@ module bottom_case() {
                 0
             ])
                 cube([3, heltec_pos_y - battery_pos_y - battery_width + 4, floor_thickness + 2]);
+
+            // Hinge Knuckles (case gets knuckles 0, 2, 4)
+            for (i = [0, 2, 4]) {
+                x_pos = hinge_margin + i * (hinge_knuckle_length + hinge_gap);
+                hinge_knuckle(x_pos, hinge_knuckle_length, -1);
+            }
 
             // Internal Antenna Housing Channel
             // Runs along front wall interior for internal LoRa antenna

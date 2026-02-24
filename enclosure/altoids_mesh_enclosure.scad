@@ -14,6 +14,7 @@
 //   - Assembly view: see everything together
 //   - Exploded view: parts separated for inspection
 //   - Print layout: parts arranged flat for 3D printing
+//   - Laptop open: lid hinged open like a laptop
 // =============================================================================
 
 include <parameters.scad>
@@ -23,10 +24,14 @@ include <parameters.scad>
 //   0 = Assembly (closed)
 //   1 = Exploded view
 //   2 = Print layout (parts flat on build plate)
+//   3 = Laptop open (lid hinged open like a laptop)
 render_mode = 1;
 
 // Exploded view separation distance
 explode_distance = 30;
+
+// Laptop open angle (degrees from closed)
+laptop_angle = 110;
 
 // ---- Import Modules ----
 use <bottom_case.scad>
@@ -101,6 +106,31 @@ module print_layout() {
         top_lid();
 }
 
+// ---- Laptop Open View ----
+module laptop_view() {
+    // Bottom case stays flat
+    bottom_case();
+
+    // Top lid rotated open around the hinge axis at the back edge
+    // Hinge axis: line parallel to X at (Y = external_width, Z = case_external_depth)
+    translate([0, external_width, case_external_depth])
+        rotate([-laptop_angle, 0, 0])
+        translate([0, -external_width, -case_external_depth])
+        // Closed lid position
+        translate([0, 0, case_external_depth + lid_external_depth])
+            rotate([180, 0, 0])
+            translate([0, -external_width, 0])
+            top_lid();
+
+    // Component models
+    if (show_components) {
+        color("green", 0.5) {
+            translate([wall_thickness, wall_thickness, 0])
+                component_assembly();
+        }
+    }
+}
+
 // ---- Render Selected Mode ----
 if (render_mode == 0) {
     assembly_view();
@@ -108,6 +138,8 @@ if (render_mode == 0) {
     exploded_view();
 } else if (render_mode == 2) {
     print_layout();
+} else if (render_mode == 3) {
+    laptop_view();
 }
 
 // ---- Dimension Annotations (console output) ----

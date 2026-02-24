@@ -42,6 +42,30 @@ module cardkb_clip(length) {
         cube([length + clip_overhang * 2, clip_thickness, clip_thickness]);
 }
 
+// ---- Lid Hinge Knuckle ----
+// Places a single knuckle barrel at the given X position.
+// In lid coordinates the hinge axis is at Y=0, Z=lid_external_depth
+// (maps to back edge hinge axis in the assembly).
+module lid_hinge_knuckle(x_pos, knuckle_len) {
+    barrel_r = hinge_barrel_outer_dia / 2;
+    translate([x_pos, 0, lid_external_depth]) {
+        difference() {
+            union() {
+                // Barrel cylinder along X
+                rotate([0, 90, 0])
+                    cylinder(d = hinge_barrel_outer_dia, h = knuckle_len, $fn = 24);
+                // Support arm connecting barrel to lid wall
+                translate([0, 0, -barrel_r])
+                    cube([knuckle_len, hinge_arm_thickness, barrel_r]);
+            }
+            // Pin hole
+            translate([-0.1, 0, 0])
+                rotate([0, 90, 0])
+                cylinder(d = hinge_pin_dia + tolerance * 2, h = knuckle_len + 0.2, $fn = 24);
+        }
+    }
+}
+
 // ---- Main Top Lid ----
 module top_lid() {
     difference() {
@@ -230,6 +254,12 @@ module top_lid() {
         lid_thickness + cardkb_ledge_height
     ])
         cardkb_clip(10);
+
+    // ---- Hinge Knuckles (lid gets knuckles 1, 3) ----
+    for (i = [1, 3]) {
+        x_pos = hinge_margin + i * (hinge_knuckle_length + hinge_gap);
+        lid_hinge_knuckle(x_pos, hinge_knuckle_length);
+    }
 }
 
 // Render the top lid
