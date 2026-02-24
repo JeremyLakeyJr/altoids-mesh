@@ -27,6 +27,7 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 - **OLED display window** in the lid, positioned above the Heltec screen
 - **USB-C port cutout** for charging and data access
 - **SMA antenna port** for external antenna connection
+- **Internal antenna housing** channel with retention clips (plastic doesn't block RF)
 - **Charging LED window** for visual status indication
 - **Ventilation** on bottom and sides for thermal management
 - **Cable routing channel** between battery and Heltec module
@@ -57,6 +58,7 @@ stl/
 ### Viewing the Design
 
 1. Open `enclosure/altoids_mesh_enclosure.scad` in OpenSCAD
+   - **All `.scad` files in the `enclosure/` directory must remain together** for includes to resolve
 2. Press **F5** for preview or **F6** for full render
 3. Change `render_mode` variable:
    - `0` = Assembled (closed) view
