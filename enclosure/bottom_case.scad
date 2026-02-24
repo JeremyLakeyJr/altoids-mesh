@@ -1,330 +1,246 @@
 // =============================================================================
-// Altoids Mesh Enclosure - Bottom Case
+// Altoids Mesh Enclosure — Bottom Case
 // =============================================================================
-// Bottom half of the enclosure housing the Heltec V4 and battery.
-// Features: battery compartment, Heltec mounting, port cutouts,
-//           ventilation, snap-fit lip, screw bosses.
+// Shallow tray (like the bottom of a real Altoids tin) that holds the
+// battery, Heltec V4, and internal antenna.  The lid skirt slides over
+// the top of these walls.
+//
+// Features:  battery compartment · Heltec mounting standoffs · USB-C &
+//            antenna port cutouts · ventilation slots · hinge knuckles ·
+//            internal antenna channel · corner screw bosses
 // =============================================================================
 
 include <parameters.scad>
 
-// ---- Rounded Rectangle Helper ----
-module rounded_rect(size, radius, center = false) {
-    offset_x = center ? -size[0] / 2 : 0;
-    offset_y = center ? -size[1] / 2 : 0;
-    translate([offset_x, offset_y, 0])
+// =========================================================================
+//  Helper Modules
+// =========================================================================
+
+// Rounded rectangle (origin at corner, Z-up)
+module rrect(size, r) {
     hull() {
-        translate([radius, radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([size[0] - radius, radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([radius, size[1] - radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([size[0] - radius, size[1] - radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
+        for (dx = [r, size[0] - r], dy = [r, size[1] - r])
+            translate([dx, dy, 0])
+                cylinder(r = r, h = size[2], $fn = 36);
     }
 }
 
-// ---- Ventilation Slots ----
-module vent_slots(count, slot_length, slot_width, slot_spacing) {
-    total_width = count * slot_width + (count - 1) * slot_spacing;
-    for (i = [0:count - 1]) {
-        translate([0, i * (slot_width + slot_spacing) - total_width / 2, 0])
-            cube([slot_length, slot_width, wall_thickness * 3], center = true);
-    }
+// Array of ventilation slots centred at origin
+module vent_slots(n, len, w, spacing) {
+    tw = n * w + (n - 1) * spacing;
+    for (i = [0 : n - 1])
+        translate([0, i * (w + spacing) - tw / 2, 0])
+            cube([len, w, wall * 3], center = true);
 }
 
-// ---- Snap-Fit Tab ----
-module snap_tab() {
-    // Flexible cantilever with catch
-    translate([0, 0, 0]) {
-        cube([snap_width, lip_thickness, lip_height - snap_depth]);
-        translate([0, -snap_depth, lip_height - snap_depth])
-            cube([snap_width, lip_thickness + snap_depth, snap_depth]);
-    }
-}
-
-// ---- Battery Retainer Clip ----
+// ----- Battery Retainer Clip -------------------------------------------------
 module battery_retainer() {
-    clip_height = battery_height * 0.6;
-    clip_thickness = 1.5;
-    clip_overhang = 2.0;
-
-    // Vertical wall
-    cube([clip_thickness, battery_width + fit_clearance * 2, clip_height]);
-
-    // Overhang lip
-    translate([0, 0, clip_height])
-        cube([clip_overhang, battery_width + fit_clearance * 2, clip_thickness]);
+    clip_h  = batt_ht * 0.6;
+    clip_t  = 1.5;
+    clip_oh = 2.0;
+    cube([clip_t, batt_wid + fit_clearance * 2, clip_h]);
+    translate([0, 0, clip_h])
+        cube([clip_oh, batt_wid + fit_clearance * 2, clip_t]);
 }
 
-// ---- Heltec Mounting Standoff ----
-module mounting_standoff(height, hole_dia, outer_dia) {
-    difference() {
-        cylinder(d = outer_dia, h = height, $fn = 24);
-        translate([0, 0, -0.1])
-            cylinder(d = hole_dia, h = height + 0.2, $fn = 24);
-    }
-}
-
-// ---- Hinge Knuckle (barrel with pin hole and support arm) ----
-// Places a single knuckle barrel at the given X position on the back edge.
-// arm_dir: +1 = arm extends toward +Y (lid), -1 = arm extends toward -Y (case)
-module hinge_knuckle(x_pos, knuckle_len, arm_dir) {
-    barrel_r = hinge_barrel_outer_dia / 2;
-    translate([x_pos, external_width, case_external_depth]) {
+// ----- Hinge Knuckle (case side) ---------------------------------------------
+// Barrel with paper-clip pin hole + support arm toward case interior.
+module case_hinge_knuckle(x_pos, klen) {
+    barrel_r = hinge_barrel_d / 2;
+    translate([x_pos, case_ext_wid, case_ext_depth]) {
         difference() {
             union() {
-                // Barrel cylinder along X
+                // Barrel along X
                 rotate([0, 90, 0])
-                    cylinder(d = hinge_barrel_outer_dia, h = knuckle_len, $fn = 24);
-                // Support arm connecting barrel to wall
-                if (arm_dir < 0) {
-                    // Case arm: extends inward (-Y) and downward (-Z)
-                    translate([0, -hinge_arm_thickness, -barrel_r])
-                        cube([knuckle_len, hinge_arm_thickness, barrel_r]);
-                } else {
-                    // Lid arm: extends inward (+Y) toward lid body
-                    translate([0, 0, -barrel_r])
-                        cube([knuckle_len, hinge_arm_thickness, barrel_r]);
-                }
+                    cylinder(d = hinge_barrel_d, h = klen, $fn = 24);
+                // Arm connecting barrel to case wall (extends -Y, -Z)
+                translate([0, -hinge_arm_t, -barrel_r])
+                    cube([klen, hinge_arm_t, barrel_r]);
             }
-            // Pin hole
+            // Pin hole (paper-clip clearance)
             translate([-0.1, 0, 0])
                 rotate([0, 90, 0])
-                cylinder(d = hinge_pin_dia + tolerance * 2, h = knuckle_len + 0.2, $fn = 24);
+                    cylinder(d = hinge_pin_d + tolerance * 2,
+                             h = klen + 0.2, $fn = 24);
         }
     }
 }
 
-// ---- Main Bottom Case ----
+// =========================================================================
+//  Main Bottom Case
+// =========================================================================
 module bottom_case() {
     difference() {
         union() {
-            // ---- Outer Shell ----
-            rounded_rect(
-                [external_length, external_width, case_external_depth],
-                corner_radius
-            );
+            // ----------------------------------------------------------
+            //  Outer shell
+            // ----------------------------------------------------------
+            rrect([case_ext_len, case_ext_wid, case_ext_depth], corner_r);
 
-            // ---- Interior Features (unioned with shell for manifold safety) ----
-
-            // Battery compartment walls
-            translate([wall_thickness + battery_pos_x - 1.5, wall_thickness + battery_pos_y - 1.5, 0]) {
+            // ----------------------------------------------------------
+            //  Battery compartment rails
+            // ----------------------------------------------------------
+            translate([wall + batt_pos_x - 1.5,
+                       wall + batt_pos_y - 1.5, 0]) {
                 // Left rail
-                cube([battery_length + battery_wire_clearance + 3, 1.5, floor_thickness + battery_height * 0.7]);
+                cube([batt_len + batt_wire_clr + 3, 1.5,
+                      floor_t + batt_ht * 0.7]);
                 // Right rail
-                translate([0, battery_width + fit_clearance * 2 + 1.5, 0])
-                    cube([battery_length + battery_wire_clearance + 3, 1.5, floor_thickness + battery_height * 0.7]);
-                // Back wall (extended into case wall)
+                translate([0, batt_wid + fit_clearance * 2 + 1.5, 0])
+                    cube([batt_len + batt_wire_clr + 3, 1.5,
+                          floor_t + batt_ht * 0.7]);
+                // Back wall
                 translate([-0.5, 0, 0])
-                    cube([2.0, battery_width + fit_clearance * 2 + 3, floor_thickness + battery_height * 0.7]);
+                    cube([2.0, batt_wid + fit_clearance * 2 + 3,
+                          floor_t + batt_ht * 0.7]);
             }
 
             // Battery retainer clip (front)
-            translate([
-                wall_thickness + battery_pos_x + battery_length + battery_wire_clearance + 1,
-                wall_thickness + battery_pos_y - 1.5,
-                0
-            ]) {
-                clip_height = battery_height * 0.6;
-                clip_thickness = 1.5;
-                clip_overhang = 2.0;
-                cube([clip_thickness, battery_width + fit_clearance * 2, floor_thickness + clip_height]);
-                translate([0, 0, floor_thickness + clip_height])
-                    cube([clip_overhang, battery_width + fit_clearance * 2, clip_thickness]);
+            translate([wall + batt_pos_x + batt_len + batt_wire_clr + 1,
+                       wall + batt_pos_y - 1.5, 0]) {
+                ch = batt_ht * 0.6;
+                ct = 1.5;
+                co = 2.0;
+                cube([ct, batt_wid + fit_clearance * 2,
+                      floor_t + ch]);
+                translate([0, 0, floor_t + ch])
+                    cube([co, batt_wid + fit_clearance * 2, ct]);
             }
 
-            // Heltec V4 mounting standoffs
-            heltec_mount_positions = [
+            // ----------------------------------------------------------
+            //  Heltec V4 mounting standoffs
+            // ----------------------------------------------------------
+            mount_pts = [
                 [2.5, 2.5],
-                [heltec_length - 2.5, 2.5],
-                [2.5, heltec_width - 2.5],
-                [heltec_length - 2.5, heltec_width - 2.5]
+                [heltec_len - 2.5, 2.5],
+                [2.5, heltec_wid - 2.5],
+                [heltec_len - 2.5, heltec_wid - 2.5]
             ];
+            for (p = mount_pts)
+                translate([wall + heltec_pos_x + p[0],
+                           wall + heltec_pos_y + p[1], 0])
+                    cylinder(d = screw_boss_d - 1,
+                             h = floor_t + heltec_standoff, $fn = 24);
 
-            for (pos = heltec_mount_positions) {
-                translate([
-                    wall_thickness + heltec_pos_x + pos[0],
-                    wall_thickness + heltec_pos_y + pos[1],
-                    0
-                ])
-                    cylinder(d = screw_boss_dia - 1, h = floor_thickness + heltec_mount_standoff, $fn = 24);
-            }
-
-            // Corner Screw Bosses
-            screw_positions = [
-                [wall_thickness + 4, wall_thickness + 4],
-                [external_length - wall_thickness - 4, wall_thickness + 4],
-                [wall_thickness + 4, external_width - wall_thickness - 4],
-                [external_length - wall_thickness - 4, external_width - wall_thickness - 4]
+            // ----------------------------------------------------------
+            //  Corner screw bosses
+            // ----------------------------------------------------------
+            screw_pts = [
+                [wall + 4, wall + 4],
+                [case_ext_len - wall - 4, wall + 4],
+                [wall + 4, case_ext_wid - wall - 4],
+                [case_ext_len - wall - 4, case_ext_wid - wall - 4]
             ];
+            for (p = screw_pts)
+                translate([p[0], p[1], 0])
+                    cylinder(d = screw_boss_d,
+                             h = case_ext_depth, $fn = 24);
 
-            for (pos = screw_positions) {
-                translate([pos[0], pos[1], 0])
-                    cylinder(d = screw_boss_dia, h = floor_thickness + case_internal_depth - lip_height + 0.1, $fn = 24);
-            }
+            // ----------------------------------------------------------
+            //  Cable channel (between battery and Heltec)
+            // ----------------------------------------------------------
+            translate([wall + batt_pos_x + batt_len,
+                       wall + batt_pos_y + batt_wid - 2, 0])
+                cube([3,
+                      heltec_pos_y - batt_pos_y - batt_wid + 4,
+                      floor_t + 2]);
 
-            // Lid Engagement Lip
-            translate([wall_thickness - lip_thickness, wall_thickness - lip_thickness, case_external_depth - lip_height])
-                rounded_rect(
-                    [internal_length + lip_thickness * 2, internal_width + lip_thickness * 2, lip_height],
-                    corner_radius - wall_thickness + lip_thickness
-                );
-
-            // Snap-Fit Tabs (long sides)
-            for (i = [1:snap_count_long]) {
-                x_pos = (external_length / (snap_count_long + 1)) * i - snap_width / 2;
-
-                translate([x_pos, wall_thickness - lip_thickness - snap_depth, case_external_depth - lip_height])
-                    snap_tab();
-                translate([x_pos, external_width - wall_thickness + lip_clearance, case_external_depth - lip_height])
-                    snap_tab();
-            }
-
-            // Snap-Fit Tabs (short sides)
-            for (i = [1:snap_count_short]) {
-                y_pos = (external_width / (snap_count_short + 1)) * i - snap_width / 2;
-
-                translate([wall_thickness - lip_thickness - snap_depth, y_pos, case_external_depth - lip_height])
-                    rotate([0, 0, 90])
-                    snap_tab();
-                translate([external_length - wall_thickness + lip_clearance, y_pos, case_external_depth - lip_height])
-                    rotate([0, 0, 90])
-                    snap_tab();
-            }
-
-            // Cable Channel (between battery and Heltec)
-            translate([
-                wall_thickness + battery_pos_x + battery_length,
-                wall_thickness + battery_pos_y + battery_width - 2,
-                0
-            ])
-                cube([3, heltec_pos_y - battery_pos_y - battery_width + 4, floor_thickness + 2]);
-
-            // Hinge Knuckles (case gets knuckles 0, 2, 4)
+            // ----------------------------------------------------------
+            //  Hinge knuckles  (case gets knuckles 0, 2, 4)
+            // ----------------------------------------------------------
             for (i = [0, 2, 4]) {
-                x_pos = hinge_margin + i * (hinge_knuckle_length + hinge_gap);
-                hinge_knuckle(x_pos, hinge_knuckle_length, -1);
+                xp = hinge_margin + i * (hinge_knuckle_l + hinge_gap);
+                case_hinge_knuckle(xp, hinge_knuckle_l);
             }
 
-            // Internal Antenna Housing Channel
-            // Runs along front wall interior for internal LoRa antenna
-            // (plastic does not block RF signals)
-            translate([
-                wall_thickness + antenna_channel_pos_x,
-                wall_thickness,
-                0
-            ]) {
-                // Retaining rail (forms channel between case wall and rail)
-                translate([0, antenna_housing_width, 0])
-                    cube([antenna_housing_length, antenna_housing_wall,
-                          floor_thickness + antenna_housing_depth]);
+            // ----------------------------------------------------------
+            //  Internal antenna housing channel
+            // ----------------------------------------------------------
+            translate([wall + ant_pos_x, wall, 0]) {
+                // Retaining rail
+                translate([0, ant_chan_w, 0])
+                    cube([ant_len, ant_rail_t,
+                          floor_t + ant_chan_d]);
                 // End walls
-                cube([antenna_housing_wall, antenna_housing_width + antenna_housing_wall,
-                      floor_thickness + antenna_housing_depth]);
-                translate([antenna_housing_length - antenna_housing_wall, 0, 0])
-                    cube([antenna_housing_wall, antenna_housing_width + antenna_housing_wall,
-                          floor_thickness + antenna_housing_depth]);
-                // Retention clips (overhang from rail into channel)
-                for (i = [0:antenna_clip_count - 1]) {
-                    clip_x = antenna_housing_length * (i + 1) / (antenna_clip_count + 1)
-                             - antenna_clip_width / 2;
-                    translate([clip_x, antenna_housing_wall + antenna_clip_offset,
-                               floor_thickness + antenna_housing_depth])
-                        cube([antenna_clip_width, antenna_housing_width,
-                              antenna_housing_wall]);
+                cube([ant_rail_t,
+                      ant_chan_w + ant_rail_t,
+                      floor_t + ant_chan_d]);
+                translate([ant_len - ant_rail_t, 0, 0])
+                    cube([ant_rail_t,
+                          ant_chan_w + ant_rail_t,
+                          floor_t + ant_chan_d]);
+                // Retention clips
+                for (i = [0 : ant_clip_n - 1]) {
+                    cx = ant_len * (i + 1) / (ant_clip_n + 1)
+                         - ant_clip_w / 2;
+                    translate([cx, ant_rail_t + ant_clip_ins,
+                               floor_t + ant_chan_d])
+                        cube([ant_clip_w, ant_chan_w, ant_rail_t]);
                 }
             }
         }
 
-        // ---- Subtractive Features ----
+        // ==============================================================
+        //  Subtractive features
+        // ==============================================================
 
-        // Hollow Interior
-        translate([wall_thickness, wall_thickness, floor_thickness])
-            rounded_rect(
-                [internal_length, internal_width, case_internal_depth + 1],
-                corner_radius - wall_thickness
-            );
+        // Hollow interior
+        translate([wall, wall, floor_t])
+            rrect([int_len, int_wid, case_int_depth + 1],
+                  corner_r - wall);
 
-        // Lip interior hollow
-        translate([wall_thickness, wall_thickness, case_external_depth - lip_height - 0.1])
-            rounded_rect(
-                [internal_length, internal_width, lip_height + 0.2],
-                corner_radius - wall_thickness
-            );
+        // USB-C port cutout
+        translate([wall + heltec_pos_x + heltec_len - 1,
+                   wall + heltec_pos_y + heltec_usbc_off_y
+                       - usbc_cut_w / 2,
+                   floor_t + heltec_standoff + heltec_pcb_t])
+            cube([wall + 2, usbc_cut_w, usbc_cut_h]);
 
-        // USB-C Port Cutout
-        translate([
-            wall_thickness + heltec_pos_x + heltec_length - 1,
-            wall_thickness + heltec_pos_y + heltec_usbc_offset_y - usbc_cutout_width / 2,
-            floor_thickness + heltec_mount_standoff + heltec_pcb_thickness
-        ])
-            cube([wall_thickness + 2, usbc_cutout_width, usbc_cutout_height]);
-
-        // Antenna Port Cutout
-        translate([
-            -1,
-            wall_thickness + heltec_pos_y + heltec_width / 2,
-            floor_thickness + heltec_pos_z - floor_thickness + heltec_height + 1
-        ])
+        // SMA antenna port cutout
+        translate([-1,
+                   wall + heltec_pos_y + heltec_wid / 2,
+                   floor_t + heltec_standoff + heltec_ht + 1])
             rotate([0, 90, 0])
-            cylinder(d = antenna_cutout_dia, h = wall_thickness + 2, $fn = 24);
+                cylinder(d = antenna_cut_d, h = wall + 2, $fn = 24);
 
-        // Side Ventilation Slots (battery side)
-        translate([
-            external_length / 2,
-            wall_thickness / 2,
-            floor_thickness + case_internal_depth / 2
-        ])
+        // Side ventilation (battery side)
+        translate([case_ext_len / 2, wall / 2,
+                   floor_t + case_int_depth / 2])
             rotate([90, 0, 0])
-            vent_slots(vent_slot_count, vent_slot_length, vent_slot_width, vent_slot_spacing);
+                vent_slots(vent_count, vent_len, vent_w, vent_space);
 
-        // Bottom Ventilation Slots (under battery)
-        translate([
-            wall_thickness + battery_pos_x + battery_length / 2,
-            wall_thickness + battery_pos_y + battery_width / 2,
-            floor_thickness / 2
-        ])
-            vent_slots(3, battery_length * 0.6, vent_slot_width, vent_slot_spacing * 1.5);
+        // Bottom ventilation (under battery)
+        translate([wall + batt_pos_x + batt_len / 2,
+                   wall + batt_pos_y + batt_wid / 2,
+                   floor_t / 2])
+            vent_slots(3, batt_len * 0.6, vent_w, vent_space * 1.5);
 
-        // Charging LED Window
-        translate([
-            external_length - wall_thickness - 1,
-            wall_thickness + heltec_pos_y + heltec_usbc_offset_y + usbc_cutout_width,
-            floor_thickness + heltec_mount_standoff + heltec_pcb_thickness + 1
-        ])
-            cube([wall_thickness + 2, 2.0, 2.0]);
+        // Charging LED window
+        translate([case_ext_len - wall - 1,
+                   wall + heltec_pos_y + heltec_usbc_off_y + usbc_cut_w,
+                   floor_t + heltec_standoff + heltec_pcb_t + 1])
+            cube([wall + 2, 2.0, 2.0]);
 
-        // Heltec mounting screw holes (matches standoff positions above)
-        heltec_hole_positions = [
-            [2.5, 2.5],
-            [heltec_length - 2.5, 2.5],
-            [2.5, heltec_width - 2.5],
-            [heltec_length - 2.5, heltec_width - 2.5]
-        ];
-        for (pos = heltec_hole_positions) {
-            translate([
-                wall_thickness + heltec_pos_x + pos[0],
-                wall_thickness + heltec_pos_y + pos[1],
-                -0.1
-            ])
-                cylinder(d = heltec_mount_hole_dia, h = floor_thickness + heltec_mount_standoff + 0.2, $fn = 24);
-        }
+        // Heltec mounting screw holes
+        for (p = [ [2.5, 2.5],
+                   [heltec_len - 2.5, 2.5],
+                   [2.5, heltec_wid - 2.5],
+                   [heltec_len - 2.5, heltec_wid - 2.5] ])
+            translate([wall + heltec_pos_x + p[0],
+                       wall + heltec_pos_y + p[1], -0.1])
+                cylinder(d = heltec_mount_hole,
+                         h = floor_t + heltec_standoff + 0.2, $fn = 24);
 
-        // Screw boss holes (matches boss positions above)
-        screw_hole_positions = [
-            [wall_thickness + 4, wall_thickness + 4],
-            [external_length - wall_thickness - 4, wall_thickness + 4],
-            [wall_thickness + 4, external_width - wall_thickness - 4],
-            [external_length - wall_thickness - 4, external_width - wall_thickness - 4]
-        ];
-        for (pos = screw_hole_positions) {
-            translate([pos[0], pos[1], -0.1])
-                cylinder(d = screw_hole_dia, h = floor_thickness + case_internal_depth - lip_height + 0.3, $fn = 24);
-        }
+        // Corner screw holes
+        for (p = [ [wall + 4, wall + 4],
+                   [case_ext_len - wall - 4, wall + 4],
+                   [wall + 4, case_ext_wid - wall - 4],
+                   [case_ext_len - wall - 4, case_ext_wid - wall - 4] ])
+            translate([p[0], p[1], -0.1])
+                cylinder(d = screw_d,
+                         h = case_ext_depth + 0.2, $fn = 24);
     }
 }
 
-// Render the bottom case
+// Render when opened directly
 bottom_case();

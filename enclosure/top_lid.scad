@@ -1,266 +1,225 @@
 // =============================================================================
-// Altoids Mesh Enclosure - Top Lid
+// Altoids Mesh Enclosure — Top Lid
 // =============================================================================
-// Top lid with CardKB integration, OLED display window, and snap-fit
-// engagement. Designed to mate with the bottom case.
+// Overlapping lid that slides over the bottom-case walls — just like a
+// real Altoids tin.  Houses the CardKB keyboard and has an OLED display
+// window.
+//
+// Features:  overlapping skirt · embossed label panel · friction-fit
+//            bump at front edge · CardKB mounting ledges & retention
+//            clips · OLED display window · hinge knuckles (paper-clip pin)
 // =============================================================================
 
 include <parameters.scad>
 
-// ---- Rounded Rectangle Helper ----
-module rounded_rect(size, radius, center = false) {
-    offset_x = center ? -size[0] / 2 : 0;
-    offset_y = center ? -size[1] / 2 : 0;
-    translate([offset_x, offset_y, 0])
+// =========================================================================
+//  Helper Modules
+// =========================================================================
+
+// Rounded rectangle (origin at corner, Z-up)
+module rrect(size, r) {
     hull() {
-        translate([radius, radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([size[0] - radius, radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([radius, size[1] - radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
-        translate([size[0] - radius, size[1] - radius, 0])
-            cylinder(r = radius, h = size[2], $fn = 36);
+        for (dx = [r, size[0] - r], dy = [r, size[1] - r])
+            translate([dx, dy, 0])
+                cylinder(r = r, h = size[2], $fn = 36);
     }
 }
 
-// ---- Snap-Fit Receiver Slot ----
-module snap_receiver() {
-    // Slot for snap tab to engage
-    translate([0, 0, 0])
-        cube([snap_width + tolerance * 2, lip_thickness + snap_depth + tolerance, snap_height + tolerance]);
+// CardKB retention clip
+module cardkb_clip(len) {
+    ch  = 3.0;   // clip height
+    ct  = 1.0;   // clip thickness
+    coh = 1.2;   // overhang
+    cube([len, ct, ch]);
+    translate([-coh, 0, ch - ct])
+        cube([len + coh * 2, ct, ct]);
 }
 
-// ---- CardKB Retention Clip ----
-module cardkb_clip(length) {
-    clip_height = 3.0;
-    clip_thickness = 1.0;
-    clip_overhang = 1.2;
-
-    cube([length, clip_thickness, clip_height]);
-    translate([-clip_overhang, 0, clip_height - clip_thickness])
-        cube([length + clip_overhang * 2, clip_thickness, clip_thickness]);
-}
-
-// ---- Lid Hinge Knuckle ----
-// Places a single knuckle barrel at the given X position.
-// In lid coordinates the hinge axis is at Y=0, Z=lid_external_depth
-// (maps to back edge hinge axis in the assembly).
-module lid_hinge_knuckle(x_pos, knuckle_len) {
-    barrel_r = hinge_barrel_outer_dia / 2;
-    translate([x_pos, 0, lid_external_depth]) {
+// ----- Lid Hinge Knuckle (lid side) ------------------------------------------
+// In lid-local coordinates the hinge axis is at Y = 0, Z = lid_ext_depth
+// (maps to the back-edge hinge axis when the lid is flipped in assembly).
+module lid_hinge_knuckle(x_pos, klen) {
+    barrel_r = hinge_barrel_d / 2;
+    translate([x_pos, 0, lid_ext_depth]) {
         difference() {
             union() {
-                // Barrel cylinder along X
                 rotate([0, 90, 0])
-                    cylinder(d = hinge_barrel_outer_dia, h = knuckle_len, $fn = 24);
-                // Support arm connecting barrel to lid wall
+                    cylinder(d = hinge_barrel_d, h = klen, $fn = 24);
+                // Arm toward lid body (+Y)
                 translate([0, 0, -barrel_r])
-                    cube([knuckle_len, hinge_arm_thickness, barrel_r]);
+                    cube([klen, hinge_arm_t, barrel_r]);
             }
-            // Pin hole
+            // Pin hole (paper-clip clearance)
             translate([-0.1, 0, 0])
                 rotate([0, 90, 0])
-                cylinder(d = hinge_pin_dia + tolerance * 2, h = knuckle_len + 0.2, $fn = 24);
+                    cylinder(d = hinge_pin_d + tolerance * 2,
+                             h = klen + 0.2, $fn = 24);
         }
     }
 }
 
-// ---- Main Top Lid ----
+// =========================================================================
+//  Main Top Lid
+// =========================================================================
 module top_lid() {
+    // Offsets caused by the wider lid vs case
+    lid_off = lid_wall + snap_clearance;   // extra width per side
+
     difference() {
         union() {
-            // ---- Outer Shell ----
-            rounded_rect(
-                [external_length, external_width, lid_external_depth],
-                corner_radius
-            );
+            // ----------------------------------------------------------
+            //  Outer shell  (top plate + skirt walls)
+            // ----------------------------------------------------------
+            // Top plate at full lid footprint
+            rrect([lid_ext_len, lid_ext_wid, lid_top_t],
+                  corner_r + lid_off);
+
+            // Skirt (short walls that slide over the case)
+            difference() {
+                rrect([lid_ext_len, lid_ext_wid, lid_top_t + lid_overlap],
+                      corner_r + lid_off);
+                // Hollow out the interior of the skirt
+                translate([lid_wall, lid_wall, -0.1])
+                    rrect([lid_ext_len - lid_wall * 2,
+                           lid_ext_wid - lid_wall * 2,
+                           lid_top_t + lid_overlap + 0.2],
+                          corner_r + lid_off - lid_wall);
+            }
+
+            // Interior pocket walls (for CardKB recess depth)
+            translate([lid_off, lid_off, lid_top_t])
+                difference() {
+                    rrect([case_ext_len, case_ext_wid, lid_int_depth],
+                          corner_r);
+                    translate([wall, wall, -0.1])
+                        rrect([int_len, int_wid, lid_int_depth + 0.2],
+                              max(0.5, corner_r - wall));
+                }
+
+            // ----------------------------------------------------------
+            //  Friction-fit bump on front skirt (Altoids-style catch)
+            // ----------------------------------------------------------
+            translate([lid_ext_len / 2 - friction_bump_w / 2,
+                       0,
+                       lid_top_t + lid_overlap * 0.4])
+                cube([friction_bump_w, lid_wall + friction_bump_h,
+                      lid_overlap * 0.3]);
+
+            // ----------------------------------------------------------
+            //  CardKB support ledges
+            // ----------------------------------------------------------
+            kb_ledge_h = lid_int_depth - cardkb_ht;
+
+            // Left ledge
+            translate([lid_off + wall + cardkb_pos_x - 0.5,
+                       lid_off + wall + cardkb_pos_y - 0.5,
+                       lid_top_t])
+                cube([cardkb_len + 1, 1.5, kb_ledge_h]);
+
+            // Right ledge
+            translate([lid_off + wall + cardkb_pos_x - 0.5,
+                       lid_off + wall + cardkb_pos_y + cardkb_wid - 1,
+                       lid_top_t])
+                cube([cardkb_len + 1, 1.5, kb_ledge_h]);
+
+            // Front ledge
+            translate([lid_off + wall + cardkb_pos_x - 0.5,
+                       lid_off + wall + cardkb_pos_y - 0.5,
+                       lid_top_t])
+                cube([1.5, cardkb_wid + 1, kb_ledge_h]);
+
+            // Back ledge
+            translate([lid_off + wall + cardkb_pos_x + cardkb_len - 1,
+                       lid_off + wall + cardkb_pos_y - 0.5,
+                       lid_top_t])
+                cube([1.5, cardkb_wid + 1, kb_ledge_h]);
+
+            // ----------------------------------------------------------
+            //  CardKB retention clips (four corners)
+            // ----------------------------------------------------------
+            for (cx = [5, cardkb_len - 15])
+                for (cy = [-0.5, cardkb_wid - 0.5])
+                    translate([lid_off + wall + cardkb_pos_x + cx,
+                               lid_off + wall + cardkb_pos_y + cy,
+                               lid_top_t + kb_ledge_h])
+                        cardkb_clip(10);
+
+            // ----------------------------------------------------------
+            //  Hinge knuckles  (lid gets knuckles 1, 3)
+            // ----------------------------------------------------------
+            // Shift by lid_off so knuckles align with case knuckles
+            translate([lid_off, lid_off + case_ext_wid, 0])
+            for (i = [1, 3]) {
+                xp = hinge_margin + i * (hinge_knuckle_l + hinge_gap);
+                barrel_r = hinge_barrel_d / 2;
+                translate([xp, 0, lid_top_t + lid_overlap]) {
+                    difference() {
+                        union() {
+                            rotate([0, 90, 0])
+                                cylinder(d = hinge_barrel_d,
+                                         h = hinge_knuckle_l, $fn = 24);
+                            // Arm toward lid body (-Y)
+                            translate([0, -hinge_arm_t, -barrel_r])
+                                cube([hinge_knuckle_l, hinge_arm_t,
+                                      barrel_r]);
+                        }
+                        translate([-0.1, 0, 0])
+                            rotate([0, 90, 0])
+                                cylinder(d = hinge_pin_d + tolerance * 2,
+                                         h = hinge_knuckle_l + 0.2,
+                                         $fn = 24);
+                    }
+                }
+            }
         }
 
-        // ---- Hollow Interior (CardKB recess) ----
-        translate([wall_thickness, wall_thickness, lid_thickness])
-            rounded_rect(
-                [internal_length, internal_width, lid_internal_depth + 1],
-                corner_radius - wall_thickness
-            );
+        // ==============================================================
+        //  Subtractive features
+        // ==============================================================
 
-        // ---- CardKB Keyboard Opening (top surface) ----
-        // Rectangular cutout in the top of the lid for key access
-        translate([
-            wall_thickness + cardkb_pos_x + 4,
-            wall_thickness + cardkb_pos_y + 4,
-            -0.1
-        ])
-            cube([
-                cardkb_length - 8,
-                cardkb_width - 8,
-                lid_thickness + 0.2
-            ]);
+        // CardKB keyboard opening (keys accessible through lid top)
+        translate([lid_off + wall + cardkb_pos_x + 4,
+                   lid_off + wall + cardkb_pos_y + 4,
+                   -0.1])
+            cube([cardkb_len - 8, cardkb_wid - 8,
+                  lid_top_t + 0.2]);
 
-        // ---- OLED Display Window ----
-        // Window in the lid positioned to align with Heltec display
-        translate([
-            wall_thickness + oled_window_x,
-            wall_thickness + oled_window_y,
-            -0.1
-        ])
-            cube([
-                oled_window_width,
-                oled_window_height,
-                lid_thickness + 0.2
-            ]);
+        // OLED display window
+        translate([lid_off + wall + oled_win_x,
+                   lid_off + wall + oled_win_y,
+                   -0.1])
+            cube([oled_win_w, oled_win_h, lid_top_t + 0.2]);
 
-        // ---- CardKB Cable Routing Slot ----
-        translate([
-            wall_thickness + cardkb_pos_x + cardkb_cable_offset - cardkb_cable_width / 2 - 1,
-            wall_thickness + cardkb_pos_y - 1,
-            lid_thickness
-        ])
-            cube([cardkb_cable_width + 2, wall_thickness + 2, cardkb_height + 2]);
+        // CardKB cable routing slot
+        translate([lid_off + wall + cardkb_pos_x
+                       + cardkb_cable_off - cardkb_cable_w / 2 - 1,
+                   lid_off + wall + cardkb_pos_y - 1,
+                   lid_top_t])
+            cube([cardkb_cable_w + 2, wall + 2, cardkb_ht + 2]);
 
-        // ---- Snap-Fit Receiver Slots ----
-        // Matching the snap tabs on the bottom case
+        // Embossed label panel (shallow recess on lid top)
+        translate([emboss_inset, emboss_inset, -0.1])
+            rrect([lid_ext_len - emboss_inset * 2,
+                   lid_ext_wid - emboss_inset * 2,
+                   emboss_depth + 0.1],
+                  emboss_r);
 
-        // Long sides
-        for (i = [1:snap_count_long]) {
-            x_pos = (external_length / (snap_count_long + 1)) * i - snap_width / 2 - tolerance;
-
-            // Front side
-            translate([x_pos, 0, lid_external_depth - snap_height - tolerance])
-                snap_receiver();
-
-            // Back side
-            translate([x_pos, external_width - lip_thickness - snap_depth - tolerance, lid_external_depth - snap_height - tolerance])
-                snap_receiver();
+        // Corner screw holes
+        for (p = [ [lid_off + wall + 4, lid_off + wall + 4],
+                   [lid_ext_len - lid_off - wall - 4, lid_off + wall + 4],
+                   [lid_off + wall + 4, lid_ext_wid - lid_off - wall - 4],
+                   [lid_ext_len - lid_off - wall - 4,
+                    lid_ext_wid - lid_off - wall - 4] ]) {
+            translate([p[0], p[1], -0.1])
+                cylinder(d = screw_d, h = lid_ext_depth + lid_overlap + 0.2,
+                         $fn = 24);
+            // Countersink
+            translate([p[0], p[1], -0.1])
+                cylinder(d1 = screw_d + 3, d2 = screw_d, h = 1.5,
+                         $fn = 24);
         }
-
-        // Short sides
-        for (i = [1:snap_count_short]) {
-            y_pos = (external_width / (snap_count_short + 1)) * i - snap_width / 2 - tolerance;
-
-            // Left side
-            translate([0, y_pos, lid_external_depth - snap_height - tolerance])
-                rotate([0, 0, 90])
-                snap_receiver();
-
-            // Right side
-            translate([external_length - lip_thickness - snap_depth - tolerance, y_pos, lid_external_depth - snap_height - tolerance])
-                rotate([0, 0, 90])
-                snap_receiver();
-        }
-
-        // ---- Corner Screw Holes ----
-        screw_positions = [
-            [wall_thickness + 4, wall_thickness + 4],
-            [external_length - wall_thickness - 4, wall_thickness + 4],
-            [wall_thickness + 4, external_width - wall_thickness - 4],
-            [external_length - wall_thickness - 4, external_width - wall_thickness - 4]
-        ];
-
-        for (pos = screw_positions) {
-            translate([pos[0], pos[1], -0.1])
-                cylinder(d = screw_hole_dia, h = lid_external_depth + 0.2, $fn = 24);
-
-            // Countersink on top
-            translate([pos[0], pos[1], -0.1])
-                cylinder(d1 = screw_hole_dia + 3, d2 = screw_hole_dia, h = 1.5, $fn = 24);
-        }
-    }
-
-    // ---- Interior Features ----
-
-    // Lid engagement rim (mates with bottom case lip)
-    translate([
-        wall_thickness + lip_clearance,
-        wall_thickness + lip_clearance,
-        lid_external_depth - lip_height
-    ])
-    difference() {
-        rounded_rect(
-            [internal_length - lip_clearance * 2, internal_width - lip_clearance * 2, lip_height],
-            corner_radius - wall_thickness - lip_clearance
-        );
-        translate([lip_thickness, lip_thickness, -0.1])
-            rounded_rect(
-                [internal_length - lip_clearance * 2 - lip_thickness * 2,
-                 internal_width - lip_clearance * 2 - lip_thickness * 2,
-                 lip_height + 0.2],
-                max(0.5, corner_radius - wall_thickness - lip_clearance - lip_thickness)
-            );
-    }
-
-    // ---- CardKB Mounting Features ----
-    // Support ledge for CardKB to rest on
-    cardkb_ledge_height = lid_internal_depth - cardkb_height;
-
-    // Side ledges
-    // Left ledge
-    translate([
-        wall_thickness + cardkb_pos_x - 0.5,
-        wall_thickness + cardkb_pos_y - 0.5,
-        lid_thickness
-    ])
-        cube([cardkb_length + 1, 1.5, cardkb_ledge_height]);
-
-    // Right ledge
-    translate([
-        wall_thickness + cardkb_pos_x - 0.5,
-        wall_thickness + cardkb_pos_y + cardkb_width - 1,
-        lid_thickness
-    ])
-        cube([cardkb_length + 1, 1.5, cardkb_ledge_height]);
-
-    // Front ledge
-    translate([
-        wall_thickness + cardkb_pos_x - 0.5,
-        wall_thickness + cardkb_pos_y - 0.5,
-        lid_thickness
-    ])
-        cube([1.5, cardkb_width + 1, cardkb_ledge_height]);
-
-    // Back ledge
-    translate([
-        wall_thickness + cardkb_pos_x + cardkb_length - 1,
-        wall_thickness + cardkb_pos_y - 0.5,
-        lid_thickness
-    ])
-        cube([1.5, cardkb_width + 1, cardkb_ledge_height]);
-
-    // CardKB retention clips (corners)
-    translate([
-        wall_thickness + cardkb_pos_x + 5,
-        wall_thickness + cardkb_pos_y - 0.5,
-        lid_thickness + cardkb_ledge_height
-    ])
-        cardkb_clip(10);
-
-    translate([
-        wall_thickness + cardkb_pos_x + cardkb_length - 15,
-        wall_thickness + cardkb_pos_y - 0.5,
-        lid_thickness + cardkb_ledge_height
-    ])
-        cardkb_clip(10);
-
-    translate([
-        wall_thickness + cardkb_pos_x + 5,
-        wall_thickness + cardkb_pos_y + cardkb_width - 0.5,
-        lid_thickness + cardkb_ledge_height
-    ])
-        cardkb_clip(10);
-
-    translate([
-        wall_thickness + cardkb_pos_x + cardkb_length - 15,
-        wall_thickness + cardkb_pos_y + cardkb_width - 0.5,
-        lid_thickness + cardkb_ledge_height
-    ])
-        cardkb_clip(10);
-
-    // ---- Hinge Knuckles (lid gets knuckles 1, 3) ----
-    for (i = [1, 3]) {
-        x_pos = hinge_margin + i * (hinge_knuckle_length + hinge_gap);
-        lid_hinge_knuckle(x_pos, hinge_knuckle_length);
     }
 }
 
-// Render the top lid
+// Render when opened directly
 top_lid();
