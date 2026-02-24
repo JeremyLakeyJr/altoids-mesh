@@ -1,152 +1,136 @@
 // =============================================================================
-// Altoids Mesh Enclosure - Main Assembly
+// Altoids Mesh Enclosure — Main Assembly
 // =============================================================================
-// Complete assembly view combining bottom case, top lid, and component models.
-// Use this file to visualize the full enclosure with components.
+// Open this file in OpenSCAD to see the complete enclosure with components.
 //
-// IMPORTANT: All companion files must be in the same directory as this file:
-//   - parameters.scad   (shared dimensions and configuration)
-//   - bottom_case.scad   (bottom half of enclosure)
-//   - top_lid.scad       (top lid with CardKB mount)
-//   - components.scad    (visual component models)
+// Render modes (change render_mode below):
+//   0 = Assembled (closed)
+//   1 = Exploded view   (default)
+//   2 = Print layout     (parts flat on build plate)
+//   3 = Laptop open      (lid hinged open)
 //
-// Render modes (uncomment one):
-//   - Assembly view: see everything together
-//   - Exploded view: parts separated for inspection
-//   - Print layout: parts arranged flat for 3D printing
-//   - Laptop open: lid hinged open like a laptop
+// Companion files (must be in the same directory):
+//   parameters.scad   — shared dimensions / configuration
+//   bottom_case.scad  — bottom half of the enclosure
+//   top_lid.scad      — top lid (Altoids-style overlapping)
+//   components.scad   — visual component models
 // =============================================================================
 
 include <parameters.scad>
 
-// ---- Render Mode Selection ----
-// Change this value to switch views:
-//   0 = Assembly (closed)
-//   1 = Exploded view
-//   2 = Print layout (parts flat on build plate)
-//   3 = Laptop open (lid hinged open like a laptop)
-render_mode = 1;
+// =====================================================================
+//  Render Settings
+// =====================================================================
+render_mode     = 1;      // 0 assembled · 1 exploded · 2 print · 3 laptop
+show_components = true;   // toggle component ghost models
+explode_dist    = 30;     // separation for exploded view  (mm)
+laptop_angle    = 110;    // lid opening angle for laptop view (°)
 
-// Exploded view separation distance
-explode_distance = 30;
-
-// Laptop open angle (degrees from closed)
-laptop_angle = 110;
-
-// ---- Import Modules ----
+// =====================================================================
+//  Import Part Modules
+// =====================================================================
 use <bottom_case.scad>
 use <top_lid.scad>
 use <components.scad>
 
-// Show/hide component models (for visualization only)
-show_components = true;
+// Offset from case origin to lid origin (the lid is wider by lid_off
+// on each side so that the skirt overlaps the case walls).
+lid_off = lid_wall + snap_clearance;
 
-// ---- Assembly View ----
+// =====================================================================
+//  Assembly Views
+// =====================================================================
+
+// ----- Closed assembly -----------------------------------------------
 module assembly_view() {
     // Bottom case
     bottom_case();
 
-    // Top lid (flipped and placed on top)
-    translate([0, 0, case_external_depth + lid_external_depth])
+    // Top lid — flipped and placed on top, offset inward by lid_off
+    translate([-lid_off, -lid_off,
+               case_ext_depth + lid_top_t + lid_overlap])
         rotate([180, 0, 0])
-        translate([0, -external_width, 0])
-        top_lid();
+            translate([0, -lid_ext_wid, 0])
+                top_lid();
 
-    // Component models
-    if (show_components) {
-        color("green", 0.5) {
-            translate([wall_thickness, wall_thickness, 0])
+    if (show_components)
+        color("green", 0.5)
+            translate([wall, wall, 0])
                 component_assembly();
-        }
-    }
 }
 
-// ---- Exploded View ----
+// ----- Exploded view -------------------------------------------------
 module exploded_view() {
-    // Bottom case
     bottom_case();
 
-    // Top lid (separated above)
-    translate([0, 0, case_external_depth + explode_distance + lid_external_depth])
+    translate([-lid_off, -lid_off,
+               case_ext_depth + explode_dist
+                   + lid_top_t + lid_overlap])
         rotate([180, 0, 0])
-        translate([0, -external_width, 0])
-        top_lid();
+            translate([0, -lid_ext_wid, 0])
+                top_lid();
 
-    // Component models (separated between case and lid)
-    if (show_components) {
-        translate([wall_thickness, wall_thickness, 0]) {
-            // Battery
-            translate([battery_pos_x, battery_pos_y, battery_pos_z + explode_distance * 0.3])
+    if (show_components)
+        translate([wall, wall, 0]) {
+            translate([batt_pos_x, batt_pos_y,
+                       batt_pos_z + explode_dist * 0.3])
                 battery_3000mah();
-
-            // Heltec V4
-            translate([heltec_pos_x, heltec_pos_y, heltec_pos_z + explode_distance * 0.5])
+            translate([heltec_pos_x, heltec_pos_y,
+                       heltec_pos_z + explode_dist * 0.5])
                 heltec_v4();
-
-            // CardKB
             translate([cardkb_pos_x, cardkb_pos_y,
-                       case_external_depth + explode_distance * 0.7 + 5])
+                       case_ext_depth + explode_dist * 0.7 + 5])
                 cardkb_unit();
-
-            // Internal Antenna
-            translate([antenna_channel_pos_x, antenna_channel_pos_y,
-                       floor_thickness + explode_distance * 0.2])
+            translate([ant_pos_x, ant_pos_y,
+                       floor_t + explode_dist * 0.2])
                 internal_antenna();
         }
-    }
 }
 
-// ---- Print Layout ----
+// ----- Print layout --------------------------------------------------
 module print_layout() {
-    // Bottom case - as is
     bottom_case();
-
-    // Top lid - placed next to bottom case, upside down for printing
-    translate([external_length + 10, 0, 0])
+    translate([case_ext_len + 10, 0, 0])
         top_lid();
 }
 
-// ---- Laptop Open View ----
+// ----- Laptop (lid hinged open) --------------------------------------
 module laptop_view() {
-    // Bottom case stays flat
     bottom_case();
 
-    // Top lid rotated open around the hinge axis at the back edge
-    // Hinge axis: line parallel to X at (Y = external_width, Z = case_external_depth)
-    translate([0, external_width, case_external_depth])
+    // Pivot around the hinge axis at the back edge of the case
+    translate([0, case_ext_wid, case_ext_depth])
         rotate([-laptop_angle, 0, 0])
-        translate([0, -external_width, -case_external_depth])
-        // Closed lid position
-        translate([0, 0, case_external_depth + lid_external_depth])
-            rotate([180, 0, 0])
-            translate([0, -external_width, 0])
-            top_lid();
+            translate([0, -case_ext_wid, -case_ext_depth])
+                // Closed-lid position
+                translate([-lid_off, -lid_off,
+                           case_ext_depth + lid_top_t + lid_overlap])
+                    rotate([180, 0, 0])
+                        translate([0, -lid_ext_wid, 0])
+                            top_lid();
 
-    // Component models
-    if (show_components) {
-        color("green", 0.5) {
-            translate([wall_thickness, wall_thickness, 0])
+    if (show_components)
+        color("green", 0.5)
+            translate([wall, wall, 0])
                 component_assembly();
-        }
-    }
 }
 
-// ---- Render Selected Mode ----
-if (render_mode == 0) {
-    assembly_view();
-} else if (render_mode == 1) {
-    exploded_view();
-} else if (render_mode == 2) {
-    print_layout();
-} else if (render_mode == 3) {
-    laptop_view();
-}
+// =====================================================================
+//  Render Selected Mode
+// =====================================================================
+if      (render_mode == 0) assembly_view();
+else if (render_mode == 1) exploded_view();
+else if (render_mode == 2) print_layout();
+else if (render_mode == 3) laptop_view();
 
-// ---- Dimension Annotations (console output) ----
-echo(str("=== Altoids Mesh Enclosure Dimensions ==="));
-echo(str("External: ", external_length, " x ", external_width, " x ", total_height, " mm"));
-echo(str("Internal: ", internal_length, " x ", internal_width, " mm"));
-echo(str("Case depth: ", case_external_depth, " mm"));
-echo(str("Lid depth: ", lid_external_depth, " mm"));
-echo(str("Wall thickness: ", wall_thickness, " mm"));
-echo(str("Standard Altoids tin: 95.5 x 60 x 21.5 mm (for reference)"));
+// =====================================================================
+//  Console Dimension Summary
+// =====================================================================
+echo(str("=== Altoids Mesh Enclosure ==="));
+echo(str("Case outer : ", case_ext_len, " × ", case_ext_wid,
+         " × ", case_ext_depth, " mm"));
+echo(str("Lid  outer : ", lid_ext_len,  " × ", lid_ext_wid,
+         " × ", lid_ext_depth,  " mm"));
+echo(str("Total height (closed): ", total_height, " mm"));
+echo(str("Hinge pin  : paper clip  ø", hinge_pin_d, " mm"));
+echo(str("(Real Altoids tin ≈ 95.5 × 60 × 21.5 mm for reference)"));

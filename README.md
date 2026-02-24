@@ -20,22 +20,25 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 | Heltec V4 (WiFi LoRa 32) | 52 × 25 × 7 | Meshtastic-compatible LoRa module with OLED display |
 | M5Stack CardKB Unit 1.1 | 88 × 54 × 5 | Credit-card-sized QWERTY keyboard (I2C) |
 | MakerFocus 3.7V 3000mAh | 65 × 36 × 10 | Lithium polymer rechargeable battery |
-| 2 mm metal rod / music wire | ~80 mm length | Hinge pin for laptop-style lid |
+| Standard paper clip | ~0.9 mm wire | Straightened — hinge pin for laptop-style lid |
 
 ## Enclosure Specifications
 
-- **Style**: Altoids tin aesthetic with rounded corners
-- **Wall thickness**: 2.0 mm (FDM-optimized)
+- **Style**: Altoids tin aesthetic — overlapping lid with embossed label panel
+- **Wall thickness**: 2.0 mm case / 1.6 mm lid skirt (FDM-optimised)
 - **Floor/ceiling**: 1.6 mm
 - **Tolerance**: 0.3 mm general, 0.5 mm component fit
-- **Closure**: Snap-fit latches with optional M2.5 screw mounting
-- **Hinge**: Barrel-type knuckle hinge along back edge (laptop-style opening)
+- **Closure**: Friction-fit overlapping lid with optional M2.5 corner screws
+- **Hinge**: Barrel-type knuckle hinge along back edge — assembled with a straightened paper clip
 - **Material**: PLA, PETG, or ABS recommended
 
-## Features
+## Key Design Features
 
-- **Laptop-style hinge** with barrel knuckles along the back edge so the lid opens like a laptop
-- **Battery compartment** with retention clips and ventilation slots for heat dissipation
+- **Altoids-style overlapping lid** — the lid skirt slides over the case walls, just like a real tin
+- **Embossed label panel** — shallow recess on the lid top for branding or labelling
+- **Front friction bump** — snap catch at the front for tool-free open/close
+- **Paper-clip hinge** — no special hardware needed; a standard paper clip becomes the hinge pin
+- **Battery compartment** with retention clips and ventilation slots
 - **Heltec V4 mounting** with M2 standoffs and PCB alignment guides
 - **CardKB integration** in the lid with support ledges and retention clips
 - **OLED display window** in the lid, positioned above the Heltec screen
@@ -44,9 +47,7 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 - **Internal antenna housing** channel with retention clips (plastic doesn't block RF)
 - **Charging LED window** for visual status indication
 - **Ventilation** on bottom and sides for thermal management
-- **Cable routing channel** between battery and Heltec module
-- **Snap-fit lid** with engagement lip for tool-free assembly
-- **Corner screw bosses** for secure closure alternative
+- **Corner screw bosses** for optional secure closure
 
 ## File Structure
 
@@ -54,11 +55,12 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 enclosure/
 ├── altoids_mesh_enclosure.scad   # Main assembly (open this first)
 ├── parameters.scad                # All configurable dimensions
-├── components.scad                # Component models for visualization
+├── components.scad                # Component models for visualisation
 ├── bottom_case.scad               # Bottom case (battery + Heltec)
 └── top_lid.scad                   # Top lid (CardKB + display window)
 docs/
-└── assembly_guide.md              # Step-by-step assembly instructions
+├── assembly_guide.md              # Step-by-step assembly instructions
+└── images/                        # Preview renders
 stl/
 └── .gitkeep                       # Export STL files here
 ```
@@ -74,7 +76,7 @@ stl/
 1. Open `enclosure/altoids_mesh_enclosure.scad` in OpenSCAD
    - **All `.scad` files in the `enclosure/` directory must remain together** for includes to resolve
 2. Press **F5** for preview or **F6** for full render
-3. Change `render_mode` variable:
+3. Change the `render_mode` variable:
    - `0` = Assembled (closed) view
    - `1` = Exploded view (default)
    - `2` = Print layout (parts flat on build plate)
@@ -85,14 +87,15 @@ stl/
 1. Open `enclosure/bottom_case.scad` → **F6** → Export as STL → save to `stl/bottom_case.stl`
 2. Open `enclosure/top_lid.scad` → **F6** → Export as STL → save to `stl/top_lid.stl`
 
-### Customization
+### Customisation
 
 All dimensions are parametric. Edit `enclosure/parameters.scad` to adjust:
 
 - Component dimensions (if using different parts)
 - Wall thickness and tolerances
-- Snap-fit vs screw mounting preferences
+- Friction fit / overlap clearance
 - Ventilation slot size and count
+- Hinge pin diameter (if using different wire)
 
 ## Printing Guidelines
 
@@ -109,6 +112,8 @@ All dimensions are parametric. Edit `enclosure/parameters.scad` to adjust:
 ## Assembly
 
 See [docs/assembly_guide.md](docs/assembly_guide.md) for detailed step-by-step instructions.
+
+**Quick summary:** install battery → mount Heltec → (optional) route internal antenna → connect and seat CardKB in lid → straighten a paper clip → thread it through the hinge knuckles → close the lid.
 
 ## License
 
