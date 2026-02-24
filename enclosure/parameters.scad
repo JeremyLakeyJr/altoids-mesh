@@ -49,7 +49,9 @@ battery_tolerance = 2.0;    // Manufacturer tolerance (±2mm)
 
 // ---- Enclosure Internal Dimensions ----
 // Calculated to fit all components with clearance
-internal_length = max(cardkb_length, battery_length + heltec_length - 15)
+// Battery and Heltec overlap by ~15mm along the length axis (staggered layout)
+component_overlap = 15;
+internal_length = max(cardkb_length, battery_length + heltec_length - component_overlap)
                   + fit_clearance * 2;  // ~92mm
 internal_width = max(cardkb_width, battery_width + heltec_width + fit_clearance)
                  + fit_clearance * 2;   // ~63mm

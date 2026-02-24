@@ -231,14 +231,14 @@ module bottom_case() {
         ])
             cube([wall_thickness + 2, 2.0, 2.0]);
 
-        // Heltec mounting screw holes
-        heltec_mount_positions2 = [
+        // Heltec mounting screw holes (matches standoff positions above)
+        heltec_hole_positions = [
             [2.5, 2.5],
             [heltec_length - 2.5, 2.5],
             [2.5, heltec_width - 2.5],
             [heltec_length - 2.5, heltec_width - 2.5]
         ];
-        for (pos = heltec_mount_positions2) {
+        for (pos = heltec_hole_positions) {
             translate([
                 wall_thickness + heltec_pos_x + pos[0],
                 wall_thickness + heltec_pos_y + pos[1],
@@ -247,14 +247,14 @@ module bottom_case() {
                 cylinder(d = heltec_mount_hole_dia, h = floor_thickness + heltec_mount_standoff + 0.2, $fn = 24);
         }
 
-        // Screw boss holes
-        screw_positions2 = [
+        // Screw boss holes (matches boss positions above)
+        screw_hole_positions = [
             [wall_thickness + 4, wall_thickness + 4],
             [external_length - wall_thickness - 4, wall_thickness + 4],
             [wall_thickness + 4, external_width - wall_thickness - 4],
             [external_length - wall_thickness - 4, external_width - wall_thickness - 4]
         ];
-        for (pos = screw_positions2) {
+        for (pos = screw_hole_positions) {
             translate([pos[0], pos[1], -0.1])
                 cylinder(d = screw_hole_dia, h = floor_thickness + case_internal_depth - lip_height + 0.3, $fn = 24);
         }
