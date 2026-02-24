@@ -133,3 +133,18 @@ oled_window_x = heltec_pos_x + heltec_oled_offset_x;
 oled_window_y = heltec_pos_y + heltec_oled_offset_y;
 oled_window_width = heltec_oled_width + 1.0;
 oled_window_height = heltec_oled_height + 1.0;
+
+// ---- Hinge (Laptop-Style) ----
+// Barrel-type (knuckle) hinge along the back edge for laptop-style opening.
+// A metal pin (2 mm rod or music wire) runs through all knuckles.
+hinge_pin_dia = 2.0;               // Hinge pin diameter (2 mm metal rod)
+hinge_barrel_outer_dia = 5.0;      // Outer diameter of hinge barrel
+hinge_knuckle_count = 5;           // Total interleaved knuckles (3 case + 2 lid)
+hinge_gap = 0.4;                   // Gap between adjacent knuckles
+hinge_margin = 8.0;                // Margin from enclosure corners
+hinge_arm_thickness = 2.0;         // Thickness of arm connecting barrel to wall
+
+// Derived hinge dimensions
+hinge_span = external_length - 2 * hinge_margin;
+hinge_total_gaps = (hinge_knuckle_count - 1) * hinge_gap;
+hinge_knuckle_length = (hinge_span - hinge_total_gaps) / hinge_knuckle_count;

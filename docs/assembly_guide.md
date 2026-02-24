@@ -17,6 +17,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 | MakerFocus 3.7V 3000mAh battery | 1 | With JST connector |
 | M2 × 5mm screws | 4 | For Heltec mounting (optional) |
 | M2.5 × 8mm screws | 4 | For lid closure (optional, snap-fit also works) |
+| 2 mm metal rod / music wire | ~80 mm | Hinge pin for laptop-style opening |
 | SMA antenna | 1 | External LoRa antenna (optional, see internal option) |
 | SMA pigtail + wire antenna | 1 | For internal antenna housing (alternative to external) |
 
@@ -73,7 +74,17 @@ If using an internal antenna instead of an external SMA antenna:
 3. Verify the keyboard keys are accessible through the keyboard opening
 4. Ensure the cable exits through the cable routing slot cleanly
 
-### Step 6: Close the Enclosure
+### Step 6: Install the Hinge Pin
+
+1. Align the bottom case and top lid so the hinge knuckles on the back edge interleave
+   - The bottom case has three knuckle barrels (positions 0, 2, 4)
+   - The top lid has two knuckle barrels (positions 1, 3)
+2. Slide the 2 mm metal rod (or music wire) through all five knuckle barrels from one side
+3. Trim the rod flush with the outer knuckles or leave a small protrusion
+4. Optionally apply a tiny drop of glue to one end to prevent the pin from sliding out
+5. Verify the lid swings open and closed smoothly around the hinge
+
+### Step 7: Close the Enclosure
 
 1. Carefully fold excess cable into the case interior
 2. Align the lid engagement rim with the bottom case lip
@@ -81,7 +92,7 @@ If using an internal antenna instead of an external SMA antenna:
 4. Verify a firm, even closure with no gaps
 5. (Optional) Install M2.5 screws through the corner holes for secure closure
 
-### Step 7: Final Checks
+### Step 8: Final Checks
 
 1. **USB-C access**: Verify a USB-C cable plugs in through the port cutout
 2. **Antenna port**: Attach the SMA antenna through the antenna port
@@ -107,3 +118,5 @@ If using an internal antenna instead of an external SMA antenna:
 | Battery rattles | Add foam tape padding or decrease battery compartment tolerances |
 | Overheating | Ensure ventilation slots are clear; consider PETG or ABS for better heat resistance |
 | CardKB keys blocked | Widen the keyboard opening by adjusting cutout margins in top_lid.scad |
+| Hinge too stiff/loose | Adjust `hinge_gap` in parameters.scad; sand barrel interiors if needed |
+| Hinge pin slides out | Bend the last 1 mm of the rod or apply a drop of glue to one end |
