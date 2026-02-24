@@ -20,7 +20,7 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 | Heltec V4 (WiFi LoRa 32) | 52 × 25 × 7 | Meshtastic-compatible LoRa module with OLED display |
 | M5Stack CardKB Unit 1.1 | 88 × 54 × 5 | Credit-card-sized QWERTY keyboard (I2C) |
 | MakerFocus 3.7V 3000mAh | 65 × 36 × 10 | Lithium polymer rechargeable battery |
-| 2 mm metal rod / music wire | ~80 length | Hinge pin for laptop-style lid |
+| 2 mm metal rod / music wire | ~80 mm length | Hinge pin for laptop-style lid |
 
 ## Enclosure Specifications
 

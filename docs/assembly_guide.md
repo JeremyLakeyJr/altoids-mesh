@@ -77,8 +77,8 @@ If using an internal antenna instead of an external SMA antenna:
 ### Step 6: Install the Hinge Pin
 
 1. Align the bottom case and top lid so the hinge knuckles on the back edge interleave
-   - The bottom case has three knuckle barrels (positions 1, 3, 5)
-   - The top lid has two knuckle barrels (positions 2, 4)
+   - The bottom case has three knuckle barrels (positions 0, 2, 4)
+   - The top lid has two knuckle barrels (positions 1, 3)
 2. Slide the 2 mm metal rod (or music wire) through all five knuckle barrels from one side
 3. Trim the rod flush with the outer knuckles or leave a small protrusion
 4. Optionally apply a tiny drop of glue to one end to prevent the pin from sliding out
