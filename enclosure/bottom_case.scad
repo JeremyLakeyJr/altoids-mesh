@@ -5,9 +5,12 @@
 // battery, Heltec V4, and internal antenna.  The lid skirt slides over
 // the top of these walls.
 //
-// Features:  battery compartment · Heltec mounting standoffs · USB-C &
-//            antenna port cutouts · ventilation slots · hinge knuckles ·
-//            internal antenna channel · corner screw bosses
+// Features:  battery compartment · Heltec mounting standoffs · hinge
+//            knuckles · internal antenna channel · corner screw bosses
+//
+// Sealed design: no port cutouts, ventilation slots, or LED windows.
+// All ports are accessed when the lid is hinged open; internal antenna
+// replaces the external SMA connector.
 // =============================================================================
 
 include <parameters.scad>
@@ -189,56 +192,24 @@ module bottom_case() {
             rrect([int_len, int_wid, case_int_depth + 1],
                   corner_r - wall);
 
-        // USB-C port cutout
-        translate([wall + heltec_pos_x + heltec_len - 1,
-                   wall + heltec_pos_y + heltec_usbc_off_y
-                       - usbc_cut_w / 2,
-                   floor_t + heltec_standoff + heltec_pcb_t])
-            cube([wall + 2, usbc_cut_w, usbc_cut_h]);
+        // NOTE: USB-C port, antenna port, ventilation, and LED window
+        // removed for sealed design.  All ports are accessible when
+        // the lid is hinged open; internal antenna replaces SMA.
 
-        // SMA antenna port cutout
-        translate([-1,
-                   wall + heltec_pos_y + heltec_wid / 2,
-                   floor_t + heltec_standoff + heltec_ht + 1])
-            rotate([0, 90, 0])
-                cylinder(d = antenna_cut_d, h = wall + 2, $fn = 24);
-
-        // Side ventilation (battery side)
-        translate([case_ext_len / 2, wall / 2,
-                   floor_t + case_int_depth / 2])
-            rotate([90, 0, 0])
-                vent_slots(vent_count, vent_len, vent_w, vent_space);
-
-        // Bottom ventilation (under battery)
-        translate([wall + batt_pos_x + batt_len / 2,
-                   wall + batt_pos_y + batt_wid / 2,
-                   floor_t / 2])
-            vent_slots(3, batt_len * 0.6, vent_w, vent_space * 1.5);
-
-        // Charging LED window
-        translate([case_ext_len - wall - 1,
-                   wall + heltec_pos_y + heltec_usbc_off_y + usbc_cut_w,
-                   floor_t + heltec_standoff + heltec_pcb_t + 1])
-            cube([wall + 2, 2.0, 2.0]);
-
-        // Heltec mounting screw holes
+        // Heltec mounting screw holes (blind — do not penetrate floor).
+        // Holes run from the inner floor surface up through each
+        // standoff (height = heltec_standoff) with 0.2 mm overcut.
         for (p = [ [2.5, 2.5],
                    [heltec_len - 2.5, 2.5],
                    [2.5, heltec_wid - 2.5],
                    [heltec_len - 2.5, heltec_wid - 2.5] ])
             translate([wall + heltec_pos_x + p[0],
-                       wall + heltec_pos_y + p[1], -0.1])
+                       wall + heltec_pos_y + p[1], floor_t])
                 cylinder(d = heltec_mount_hole,
-                         h = floor_t + heltec_standoff + 0.2, $fn = 24);
+                         h = heltec_standoff + 0.2, $fn = 24);
 
-        // Corner screw holes
-        for (p = [ [wall + 4, wall + 4],
-                   [case_ext_len - wall - 4, wall + 4],
-                   [wall + 4, case_ext_wid - wall - 4],
-                   [case_ext_len - wall - 4, case_ext_wid - wall - 4] ])
-            translate([p[0], p[1], -0.1])
-                cylinder(d = screw_d,
-                         h = case_ext_depth + 0.2, $fn = 24);
+        // NOTE: corner screw holes removed for sealed design.
+        // Solid screw bosses remain for structural reinforcement.
     }
 }
 
