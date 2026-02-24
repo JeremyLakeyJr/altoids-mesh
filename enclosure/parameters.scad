@@ -100,12 +100,14 @@ antenna_cutout_dia = heltec_antenna_dia + tolerance * 2;
 // Channel along front wall for housing LoRa antenna internally.
 // Plastic enclosure does not block RF signals, so the antenna can be
 // routed inside the case instead of requiring an external SMA antenna.
-antenna_housing_length = 82.0;      // Quarter-wave antenna length (915 MHz)
+antenna_housing_length = 82.0;      // Quarter-wave antenna length for 915 MHz
+                                    // (c / f / 4 ≈ 82 mm; adjust for 868/433 MHz bands)
 antenna_housing_width = 2.0;        // Channel width (wire/pigtail antenna)
 antenna_housing_depth = 3.5;        // Rail height above floor
 antenna_housing_wall = 0.8;         // Retaining rail thickness
 antenna_clip_count = 3;             // Number of retention clips
 antenna_clip_width = 4.0;           // Width of each retention clip
+antenna_clip_offset = 0.3;          // Clip inset from rail edge for snug fit
 
 // Antenna channel position (front wall interior, centered along length)
 antenna_channel_pos_x = (internal_length - antenna_housing_length) / 2;

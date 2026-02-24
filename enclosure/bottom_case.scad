@@ -194,7 +194,7 @@ module bottom_case() {
                 for (i = [0:antenna_clip_count - 1]) {
                     clip_x = antenna_housing_length * (i + 1) / (antenna_clip_count + 1)
                              - antenna_clip_width / 2;
-                    translate([clip_x, antenna_housing_wall + 0.3,
+                    translate([clip_x, antenna_housing_wall + antenna_clip_offset,
                                floor_thickness + antenna_housing_depth])
                         cube([antenna_clip_width, antenna_housing_width,
                               antenna_housing_wall]);
