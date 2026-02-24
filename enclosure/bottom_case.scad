@@ -171,6 +171,35 @@ module bottom_case() {
                 0
             ])
                 cube([3, heltec_pos_y - battery_pos_y - battery_width + 4, floor_thickness + 2]);
+
+            // Internal Antenna Housing Channel
+            // Runs along front wall interior for internal LoRa antenna
+            // (plastic does not block RF signals)
+            translate([
+                wall_thickness + antenna_channel_pos_x,
+                wall_thickness,
+                0
+            ]) {
+                // Retaining rail (forms channel between case wall and rail)
+                translate([0, antenna_housing_width, 0])
+                    cube([antenna_housing_length, antenna_housing_wall,
+                          floor_thickness + antenna_housing_depth]);
+                // End walls
+                cube([antenna_housing_wall, antenna_housing_width + antenna_housing_wall,
+                      floor_thickness + antenna_housing_depth]);
+                translate([antenna_housing_length - antenna_housing_wall, 0, 0])
+                    cube([antenna_housing_wall, antenna_housing_width + antenna_housing_wall,
+                          floor_thickness + antenna_housing_depth]);
+                // Retention clips (overhang from rail into channel)
+                for (i = [0:antenna_clip_count - 1]) {
+                    clip_x = antenna_housing_length * (i + 1) / (antenna_clip_count + 1)
+                             - antenna_clip_width / 2;
+                    translate([clip_x, antenna_housing_wall + antenna_clip_offset,
+                               floor_thickness + antenna_housing_depth])
+                        cube([antenna_clip_width, antenna_housing_width,
+                              antenna_housing_wall]);
+                }
+            }
         }
 
         // ---- Subtractive Features ----

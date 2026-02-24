@@ -71,6 +71,19 @@ module battery_3000mah() {
     }
 }
 
+// ---- Internal LoRa Antenna (wire type) ----
+module internal_antenna() {
+    color("silver", 0.9) {
+        // Wire antenna element
+        translate([2, antenna_housing_width / 2, 1])
+            rotate([0, 90, 0])
+            cylinder(d = 1.0, h = antenna_housing_length - 4, $fn = 12);
+        // SMA pigtail connector end
+        translate([-1, 0, 0])
+            cube([3, antenna_housing_width, 2.5]);
+    }
+}
+
 // ---- Assembly Preview ----
 module component_assembly() {
     // Battery
@@ -84,6 +97,10 @@ module component_assembly() {
     // CardKB (shown above case for reference)
     translate([cardkb_pos_x, cardkb_pos_y, case_external_depth + lid_external_depth + 2])
         cardkb_unit();
+
+    // Internal LoRa antenna
+    translate([antenna_channel_pos_x, antenna_channel_pos_y, floor_thickness])
+        internal_antenna();
 }
 
 // Preview when opened directly

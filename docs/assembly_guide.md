@@ -17,7 +17,8 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 | MakerFocus 3.7V 3000mAh battery | 1 | With JST connector |
 | M2 × 5mm screws | 4 | For Heltec mounting (optional) |
 | M2.5 × 8mm screws | 4 | For lid closure (optional, snap-fit also works) |
-| SMA antenna | 1 | External LoRa antenna |
+| SMA antenna | 1 | External LoRa antenna (optional, see internal option) |
+| SMA pigtail + wire antenna | 1 | For internal antenna housing (alternative to external) |
 
 ## Pre-Assembly Checks
 
@@ -45,20 +46,34 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 5. Secure with M2 screws through the mounting holes (optional — friction fit works for prototyping)
 6. Verify the OLED display faces upward and is centered under the lid display window
 
-### Step 3: Connect the CardKB
+### Step 3: Install Internal Antenna (Optional)
+
+If using an internal antenna instead of an external SMA antenna:
+
+1. Connect an SMA pigtail cable to the Heltec V4 antenna connector
+2. Route the wire antenna along the antenna housing channel on the front wall of the case
+3. Tuck the wire under the retention clips to secure it in the channel
+4. Ensure the antenna wire is fully seated in the channel and does not interfere with other components
+
+> **Note:** The plastic enclosure does not block RF signals, so an internal wire
+> antenna provides comparable performance to an external antenna while keeping
+> the enclosure sealed and compact. A quarter-wave wire antenna (~82 mm for
+> 915 MHz) fits the housing channel.
+
+### Step 4: Connect the CardKB
 
 1. Connect the Grove/I2C cable to the Heltec V4's I2C port
 2. Route the cable through the cable routing slot in the lid
 3. Connect the other end to the CardKB Unit 1.1
 
-### Step 4: Install CardKB in Lid
+### Step 5: Install CardKB in Lid
 
 1. With the lid interior facing up, place the CardKB onto the support ledges
 2. Press down gently until the retention clips snap over the edges
 3. Verify the keyboard keys are accessible through the keyboard opening
 4. Ensure the cable exits through the cable routing slot cleanly
 
-### Step 5: Close the Enclosure
+### Step 6: Close the Enclosure
 
 1. Carefully fold excess cable into the case interior
 2. Align the lid engagement rim with the bottom case lip
@@ -66,7 +81,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 4. Verify a firm, even closure with no gaps
 5. (Optional) Install M2.5 screws through the corner holes for secure closure
 
-### Step 6: Final Checks
+### Step 7: Final Checks
 
 1. **USB-C access**: Verify a USB-C cable plugs in through the port cutout
 2. **Antenna port**: Attach the SMA antenna through the antenna port

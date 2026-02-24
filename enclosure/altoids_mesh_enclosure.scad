@@ -4,6 +4,12 @@
 // Complete assembly view combining bottom case, top lid, and component models.
 // Use this file to visualize the full enclosure with components.
 //
+// IMPORTANT: All companion files must be in the same directory as this file:
+//   - parameters.scad   (shared dimensions and configuration)
+//   - bottom_case.scad   (bottom half of enclosure)
+//   - top_lid.scad       (top lid with CardKB mount)
+//   - components.scad    (visual component models)
+//
 // Render modes (uncomment one):
 //   - Assembly view: see everything together
 //   - Exploded view: parts separated for inspection
@@ -76,6 +82,11 @@ module exploded_view() {
             translate([cardkb_pos_x, cardkb_pos_y,
                        case_external_depth + explode_distance * 0.7 + 5])
                 cardkb_unit();
+
+            // Internal Antenna
+            translate([antenna_channel_pos_x, antenna_channel_pos_y,
+                       floor_thickness + explode_distance * 0.2])
+                internal_antenna();
         }
     }
 }
