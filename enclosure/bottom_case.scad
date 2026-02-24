@@ -196,7 +196,9 @@ module bottom_case() {
         // removed for sealed design.  All ports are accessible when
         // the lid is hinged open; internal antenna replaces SMA.
 
-        // Heltec mounting screw holes (blind — do not penetrate floor)
+        // Heltec mounting screw holes (blind — do not penetrate floor).
+        // Holes run from the inner floor surface up through each
+        // standoff (height = heltec_standoff) with 0.2 mm overcut.
         for (p = [ [2.5, 2.5],
                    [heltec_len - 2.5, 2.5],
                    [2.5, heltec_wid - 2.5],

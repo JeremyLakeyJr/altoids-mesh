@@ -16,7 +16,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 | Heltec V4 module | 1 | With OLED display |
 | M5Stack CardKB Unit 1.1 | 1 | With Grove/I2C cable |
 | MakerFocus 3.7V 3000mAh battery | 1 | With JST connector |
-| M2 × 5mm screws | 4 | For Heltec mounting (optional) |
+| M2 × 5mm screws | 4 | For Heltec mounting (recommended for sealed use) |
 | Standard paper clip | 1 | Straightened — used as the hinge pin (~0.9 mm wire) |
 | SMA pigtail + wire antenna | 1 | For internal antenna housing |
 
@@ -41,7 +41,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 
 1. Connect the battery JST connector to the Heltec V4 battery input
 2. Lower the Heltec V4 onto the four mounting standoffs
-3. Secure with M2 screws through the mounting holes (optional — friction fit works for prototyping)
+3. Secure with M2 screws through the mounting holes (recommended for sealed use)
 4. Verify the OLED display faces upward and is visible when the lid is open
 
 ### Step 3: Install Internal Antenna
