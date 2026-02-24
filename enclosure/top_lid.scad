@@ -7,7 +7,10 @@
 //
 // Features:  overlapping skirt · embossed label panel · friction-fit
 //            bump at front edge · CardKB mounting ledges & retention
-//            clips · OLED display window · hinge knuckles (paper-clip pin)
+//            clips · hinge knuckles (paper-clip pin)
+//
+// Sealed design: no through-holes in the top plate.  Keyboard and
+// display are accessible only when the lid is hinged open (laptop mode).
 // =============================================================================
 
 include <parameters.scad>
@@ -177,18 +180,9 @@ module top_lid() {
         //  Subtractive features
         // ==============================================================
 
-        // CardKB keyboard opening (keys accessible through lid top)
-        translate([lid_off + wall + cardkb_pos_x + 4,
-                   lid_off + wall + cardkb_pos_y + 4,
-                   -0.1])
-            cube([cardkb_len - 8, cardkb_wid - 8,
-                  lid_top_t + 0.2]);
-
-        // OLED display window
-        translate([lid_off + wall + oled_win_x,
-                   lid_off + wall + oled_win_y,
-                   -0.1])
-            cube([oled_win_w, oled_win_h, lid_top_t + 0.2]);
+        // NOTE: keyboard and display openings removed for sealed design.
+        // Keys and OLED are accessible through the open lid pocket in
+        // laptop mode; no through-holes in the top plate when closed.
 
         // CardKB cable routing slot
         translate([lid_off + wall + cardkb_pos_x
@@ -204,20 +198,8 @@ module top_lid() {
                    emboss_depth + 0.1],
                   emboss_r);
 
-        // Corner screw holes
-        for (p = [ [lid_off + wall + 4, lid_off + wall + 4],
-                   [lid_ext_len - lid_off - wall - 4, lid_off + wall + 4],
-                   [lid_off + wall + 4, lid_ext_wid - lid_off - wall - 4],
-                   [lid_ext_len - lid_off - wall - 4,
-                    lid_ext_wid - lid_off - wall - 4] ]) {
-            translate([p[0], p[1], -0.1])
-                cylinder(d = screw_d, h = lid_ext_depth + lid_overlap + 0.2,
-                         $fn = 24);
-            // Countersink
-            translate([p[0], p[1], -0.1])
-                cylinder(d1 = screw_d + 3, d2 = screw_d, h = 1.5,
-                         $fn = 24);
-        }
+        // NOTE: corner screw holes removed for sealed design.
+        // Lid closure relies on friction-fit bump + hinge.
     }
 }
 

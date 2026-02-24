@@ -28,26 +28,23 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 - **Wall thickness**: 2.0 mm case / 1.6 mm lid skirt (FDM-optimised)
 - **Floor/ceiling**: 1.6 mm
 - **Tolerance**: 0.3 mm general, 0.5 mm component fit
-- **Closure**: Friction-fit overlapping lid with optional M2.5 corner screws
+- **Closure**: Friction-fit overlapping lid with paper-clip barrel hinge
 - **Hinge**: Barrel-type knuckle hinge along back edge — assembled with a straightened paper clip
 - **Material**: PLA, PETG, or ABS recommended
 
 ## Key Design Features
 
+- **Fully sealed when closed** — no through-holes, ports, or vents; all interfaces accessible when lid is hinged open
 - **Altoids-style overlapping lid** — the lid skirt slides over the case walls, just like a real tin
 - **Embossed label panel** — shallow recess on the lid top for branding or labelling
 - **Front friction bump** — snap catch at the front for tool-free open/close
 - **Paper-clip hinge** — no special hardware needed; a standard paper clip becomes the hinge pin
-- **Battery compartment** with retention clips and ventilation slots
+- **Battery compartment** with retention clips
 - **Heltec V4 mounting** with M2 standoffs and PCB alignment guides
 - **CardKB integration** in the lid with support ledges and retention clips
-- **OLED display window** in the lid, positioned above the Heltec screen
-- **USB-C port cutout** for charging and data access
-- **SMA antenna port** for external antenna connection
-- **Internal antenna housing** channel with retention clips (plastic doesn't block RF)
-- **Charging LED window** for visual status indication
-- **Ventilation** on bottom and sides for thermal management
-- **Corner screw bosses** for optional secure closure
+- **OLED display** visible when lid is open
+- **Internal antenna housing** channel with retention clips — primary antenna solution (plastic doesn't block RF)
+- **Corner screw bosses** for structural reinforcement
 
 ## File Structure
 
@@ -94,7 +91,6 @@ All dimensions are parametric. Edit `enclosure/parameters.scad` to adjust:
 - Component dimensions (if using different parts)
 - Wall thickness and tolerances
 - Friction fit / overlap clearance
-- Ventilation slot size and count
 - Hinge pin diameter (if using different wire)
 
 ## Printing Guidelines
@@ -113,7 +109,7 @@ All dimensions are parametric. Edit `enclosure/parameters.scad` to adjust:
 
 See [docs/assembly_guide.md](docs/assembly_guide.md) for detailed step-by-step instructions.
 
-**Quick summary:** install battery → mount Heltec → (optional) route internal antenna → connect and seat CardKB in lid → straighten a paper clip → thread it through the hinge knuckles → close the lid.
+**Quick summary:** install battery → mount Heltec → route internal antenna → connect and seat CardKB in lid → straighten a paper clip → thread it through the hinge knuckles → close the lid.
 
 ## License
 
