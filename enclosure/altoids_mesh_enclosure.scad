@@ -127,6 +127,7 @@ else if (render_mode == 3) laptop_view();
 //  Console Dimension Summary
 // =====================================================================
 echo(str("=== Altoids Mesh Enclosure ==="));
+echo(str("Board      : Heltec WiFi LoRa 32 V", board_version));
 echo(str("Case outer : ", case_ext_len, " × ", case_ext_wid,
          " × ", case_ext_depth, " mm"));
 echo(str("Lid  outer : ", lid_ext_len,  " × ", lid_ext_wid,

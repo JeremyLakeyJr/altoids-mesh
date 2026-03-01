@@ -7,6 +7,14 @@
 // =============================================================================
 
 // =====================================================================
+//  0. BOARD VERSION SELECTOR
+// =====================================================================
+// Set board_version to choose which Heltec board the enclosure targets:
+//   3 = Heltec WiFi LoRa 32 V3  (ESP32-S3, SX1262, IPEX antenna)
+//   4 = Heltec WiFi LoRa 32 V4  (default)
+board_version = 4;
+
+// =====================================================================
 //  1. PRINTING TOLERANCES
 // =====================================================================
 tolerance       = 0.3;   // General FDM tolerance
@@ -24,20 +32,22 @@ corner_r        = 3.0;   // External corner radius (Altoids aesthetic)
 fillet_r        = 1.0;   // Internal fillet radius for strength
 
 // =====================================================================
-//  3. COMPONENT DIMENSIONS — Heltec WiFi LoRa 32 V4
+//  3. COMPONENT DIMENSIONS — Heltec WiFi LoRa 32 (V3 / V4)
 // =====================================================================
-heltec_len          = 52.0;   // PCB length  (X)
-heltec_wid          = 25.0;   // PCB width   (Y)
-heltec_ht           = 7.0;    // Component height (Z, incl. parts on PCB)
-heltec_pcb_t        = 1.6;    // PCB thickness
+// V3: 50.2 × 25.5 × 10.2 mm, IPEX/U.FL antenna, ESP32-S3 + SX1262
+// V4: 52   × 25   ×  7   mm, SMA antenna
+heltec_len          = (board_version == 3) ? 50.2 : 52.0;
+heltec_wid          = (board_version == 3) ? 25.5 : 25.0;
+heltec_ht           = (board_version == 3) ? 10.2 :  7.0;
+heltec_pcb_t        = 1.6;    // PCB thickness (same for both)
 heltec_usbc_w       = 9.0;    // USB-C port width
 heltec_usbc_h       = 3.5;    // USB-C port height
-heltec_usbc_off_y   = 12.5;   // USB-C centre offset from PCB edge (Y)
-heltec_oled_w       = 27.0;   // OLED display window width
+heltec_usbc_off_y   = (board_version == 3) ? 12.75 : 12.5;
+heltec_oled_w       = 27.0;   // OLED display window width  (0.96" on both)
 heltec_oled_h       = 11.0;   // OLED display window height
-heltec_oled_off_x   = 12.0;   // OLED offset from PCB edge (X)
+heltec_oled_off_x   = (board_version == 3) ? 10.0 : 12.0;
 heltec_oled_off_y   = 7.0;    // OLED offset from PCB edge (Y)
-heltec_antenna_dia  = 6.5;    // SMA antenna connector diameter
+heltec_antenna_dia  = (board_version == 3) ?  3.0 :  6.5;
 heltec_mount_hole   = 2.2;    // Mounting-hole diameter (M2 screw)
 heltec_standoff     = 3.0;    // Stand-off height under PCB
 

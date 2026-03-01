@@ -17,6 +17,7 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 
 | Component | Dimensions (mm) | Description |
 |-----------|-----------------|-------------|
+| Heltec V3 (WiFi LoRa 32) | 50.2 × 25.5 × 10.2 | ESP32-S3 + SX1262 LoRa module with OLED display (IPEX antenna) |
 | Heltec V4 (WiFi LoRa 32) | 52 × 25 × 7 | Meshtastic-compatible LoRa module with OLED display |
 | M5Stack CardKB Unit 1.1 | 88 × 54 × 5 | Credit-card-sized QWERTY keyboard (I2C) |
 | MakerFocus 3.7V 3000mAh | 65 × 36 × 10 | Lithium polymer rechargeable battery |
@@ -40,7 +41,7 @@ A parametric, 3D-printable enclosure modeled after an Altoids tin, designed to h
 - **Front friction bump** — snap catch at the front for tool-free open/close
 - **Paper-clip hinge** — no special hardware needed; a standard paper clip becomes the hinge pin
 - **Battery compartment** with retention clips
-- **Heltec V4 mounting** with M2 standoffs and PCB alignment guides
+- **Heltec V3 / V4 mounting** with M2 standoffs and PCB alignment guides
 - **CardKB integration** in the lid with support ledges and retention clips
 - **OLED display** visible when lid is open
 - **Internal antenna housing** channel with retention clips — primary antenna solution (plastic doesn't block RF)
@@ -88,6 +89,7 @@ stl/
 
 All dimensions are parametric. Edit `enclosure/parameters.scad` to adjust:
 
+- **Board version** — set `board_version = 3` for Heltec V3 or `board_version = 4` for Heltec V4 (default)
 - Component dimensions (if using different parts)
 - Wall thickness and tolerances
 - Friction fit / overlap clearance

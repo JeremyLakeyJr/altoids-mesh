@@ -33,6 +33,32 @@ module heltec_v4() {
             cylinder(d = heltec_antenna_dia, h = 3, $fn = 24);
 }
 
+// ----- Heltec WiFi LoRa 32 V3 ------------------------------------------------
+module heltec_v3() {
+    color("darkgreen", 0.8) {
+        // PCB
+        cube([heltec_len, heltec_wid, heltec_pcb_t]);
+        // Components on top (taller LoRa module)
+        translate([2, 2, heltec_pcb_t])
+            cube([heltec_len - 4, heltec_wid - 4,
+                  heltec_ht - heltec_pcb_t]);
+    }
+    // OLED display
+    color("black", 0.9)
+        translate([heltec_oled_off_x, heltec_oled_off_y, heltec_ht - 0.5])
+            cube([heltec_oled_w, heltec_oled_h, 0.5]);
+    // USB-C port
+    color("silver", 0.9)
+        translate([heltec_len - 1,
+                   heltec_usbc_off_y - heltec_usbc_w / 2,
+                   heltec_pcb_t])
+            cube([3, heltec_usbc_w, heltec_usbc_h]);
+    // IPEX / U.FL antenna connector (much smaller than SMA)
+    color("gold", 0.9)
+        translate([1, heltec_wid / 2, heltec_ht])
+            cylinder(d = heltec_antenna_dia, h = 1.5, $fn = 24);
+}
+
 // ----- M5Stack CardKB Unit 1.1 -----------------------------------------------
 module cardkb_unit() {
     color("dimgray", 0.8)
@@ -86,9 +112,10 @@ module component_assembly() {
     // Battery
     translate([batt_pos_x, batt_pos_y, batt_pos_z])
         battery_3000mah();
-    // Heltec V4
+    // Heltec board (V3 or V4 based on board_version)
     translate([heltec_pos_x, heltec_pos_y, heltec_pos_z])
-        heltec_v4();
+        if (board_version == 3) heltec_v3();
+        else                    heltec_v4();
     // CardKB (shown above case for reference)
     translate([cardkb_pos_x, cardkb_pos_y,
                case_ext_depth + lid_ext_depth + 2])
