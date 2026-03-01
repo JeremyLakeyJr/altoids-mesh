@@ -2,8 +2,8 @@
 // Altoids Mesh Enclosure — Bottom Case
 // =============================================================================
 // Shallow tray (like the bottom of a real Altoids tin) that holds the
-// battery, Heltec V4, and internal antenna.  The lid skirt slides over
-// the top of these walls.
+// battery, Heltec board (V3 or V4), and internal antenna.  The lid skirt
+// slides over the top of these walls.
 //
 // Features:  battery compartment · Heltec mounting standoffs · hinge
 //            knuckles · internal antenna channel · corner screw bosses

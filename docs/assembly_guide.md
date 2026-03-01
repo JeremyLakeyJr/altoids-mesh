@@ -13,7 +13,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 
 | Item | Quantity | Notes |
 |------|----------|-------|
-| Heltec V4 module | 1 | With OLED display |
+| Heltec V3 or V4 module | 1 | With OLED display (set `board_version` in parameters.scad to match) |
 | M5Stack CardKB Unit 1.1 | 1 | With Grove/I2C cable |
 | MakerFocus 3.7V 3000mAh battery | 1 | With JST connector |
 | M2 × 5mm screws | 4 | For Heltec mounting (recommended for sealed use) |
@@ -37,10 +37,10 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 4. Verify the battery retention clip holds the battery securely
 5. Ensure the battery sits flat and does not obstruct the Heltec mounting standoffs
 
-### Step 2: Mount the Heltec V4
+### Step 2: Mount the Heltec Board
 
-1. Connect the battery JST connector to the Heltec V4 battery input
-2. Lower the Heltec V4 onto the four mounting standoffs
+1. Connect the battery JST connector to the Heltec board's battery input
+2. Lower the Heltec board onto the four mounting standoffs
 3. Secure with M2 screws through the mounting holes (recommended for sealed use)
 4. Verify the OLED display faces upward and is visible when the lid is open
 
@@ -48,7 +48,7 @@ Step-by-step instructions for assembling the Altoids Mesh enclosure.
 
 The sealed design uses an internal wire antenna:
 
-1. Connect an SMA pigtail cable to the Heltec V4 antenna connector
+1. Connect an SMA pigtail cable (V4) or IPEX/U.FL pigtail (V3) to the Heltec antenna connector
 2. Route the wire antenna along the antenna housing channel on the front wall of the case
 3. Tuck the wire under the retention clips to secure it in the channel
 4. Ensure the antenna wire is fully seated in the channel and does not interfere with other components
@@ -61,7 +61,7 @@ The sealed design uses an internal wire antenna:
 
 ### Step 4: Connect the CardKB
 
-1. Connect the Grove/I2C cable to the Heltec V4's I2C port
+1. Connect the Grove/I2C cable to the Heltec board's I2C port
 2. Connect the other end to the CardKB Unit 1.1
 
 ### Step 5: Install CardKB in Lid
@@ -103,7 +103,7 @@ The sealed design uses an internal wire antenna:
 3. **Display visibility**: Confirm the OLED display is visible when the lid is open
 4. **Keyboard function**: Test all CardKB keys with the lid open
 5. **Hinge action**: Open and close the lid several times to verify smooth operation
-6. **Power on**: Turn on the Heltec V4 and verify Meshtastic boots correctly
+6. **Power on**: Turn on the Heltec board and verify Meshtastic boots correctly
 
 ## Disassembly
 
