@@ -7,10 +7,7 @@
 //
 // Features:  battery compartment · Heltec mounting standoffs · hinge
 //            knuckles · internal antenna channel · corner screw bosses
-//
-// Sealed design: no port cutouts, ventilation slots, or LED windows.
-// All ports are accessed when the lid is hinged open; internal antenna
-// replaces the external SMA connector.
+//            USB-C port cutout · SMA antenna passthrough · wire routing
 // =============================================================================
 
 include <parameters.scad>
@@ -192,9 +189,26 @@ module bottom_case() {
             rrect([int_len, int_wid, case_int_depth + 1],
                   corner_r - wall);
 
-        // NOTE: USB-C port, antenna port, ventilation, and LED window
-        // removed for sealed design.  All ports are accessible when
-        // the lid is hinged open; internal antenna replaces SMA.
+        // USB-C port cutout (through +X end wall)
+        translate([case_ext_len - wall - 0.1,
+                   wall + heltec_pos_y + heltec_usbc_off_y
+                       - usbc_cut_w / 2,
+                   heltec_pos_z + heltec_pcb_t - tolerance])
+            cube([wall + 0.2, usbc_cut_w, usbc_cut_h]);
+
+        // SMA antenna passthrough (through −X end wall)
+        translate([-0.1,
+                   wall + heltec_pos_y + heltec_wid / 2,
+                   heltec_pos_z + heltec_ht / 2])
+            rotate([0, 90, 0])
+                cylinder(d = antenna_cut_d, h = wall + 0.2, $fn = 24);
+
+        // Wire routing slot (through back wall, between battery and
+        // Heltec areas — allows external cable entry)
+        translate([wall + batt_pos_x + batt_len,
+                   case_ext_wid - wall - 0.1,
+                   floor_t])
+            cube([wire_slot_w, wall + 0.2, wire_slot_h]);
 
         // Heltec mounting screw holes (blind — do not penetrate floor).
         // Holes run from the inner floor surface up through each
