@@ -19,7 +19,7 @@ board_version = 4;
 // =====================================================================
 tolerance       = 0.3;   // General FDM tolerance
 fit_clearance   = 0.5;   // Clearance for component pockets
-snap_clearance  = 0.2;   // Clearance for snap / friction fits
+snap_clearance  = 0.4;   // Clearance for snap / friction fits
 
 // =====================================================================
 //  2. WALL & STRUCTURE

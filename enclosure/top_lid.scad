@@ -90,13 +90,19 @@ module top_lid() {
             }
 
             // Interior pocket walls (for CardKB recess depth)
-            translate([lid_off, lid_off, lid_top_t])
+            // Pocket must fit inside the case walls with clearance
+            translate([lid_off + wall + snap_clearance,
+                       lid_off + wall + snap_clearance, lid_top_t])
                 difference() {
-                    rrect([case_ext_len, case_ext_wid, lid_int_depth],
-                          corner_r);
-                    translate([wall, wall, -0.1])
-                        rrect([int_len, int_wid, lid_int_depth + 0.2],
-                              max(0.5, corner_r - wall));
+                    rrect([int_len - snap_clearance * 2,
+                           int_wid - snap_clearance * 2,
+                           lid_int_depth],
+                          max(0.5, corner_r - wall));
+                    translate([lid_wall, lid_wall, -0.1])
+                        rrect([int_len - snap_clearance * 2 - lid_wall * 2,
+                               int_wid - snap_clearance * 2 - lid_wall * 2,
+                               lid_int_depth + 0.2],
+                              max(0.5, corner_r - wall - lid_wall));
                 }
 
             // ----------------------------------------------------------
@@ -109,33 +115,33 @@ module top_lid() {
                       lid_overlap * 0.3]);
 
             // ----------------------------------------------------------
-            //  CardKB support ledges
+            //  CardKB support ledges  (1 mm clearance all around)
             // ----------------------------------------------------------
             kb_ledge_h = lid_int_depth - cardkb_ht;
 
             // Left ledge
-            translate([lid_off + wall + cardkb_pos_x - 0.5,
-                       lid_off + wall + cardkb_pos_y - 0.5,
+            translate([lid_off + wall + cardkb_pos_x - 1.0,
+                       lid_off + wall + cardkb_pos_y - 1.0,
                        lid_top_t])
-                cube([cardkb_len + 1, 1.5, kb_ledge_h]);
+                cube([cardkb_len + 2, 1.5, kb_ledge_h]);
 
             // Right ledge
-            translate([lid_off + wall + cardkb_pos_x - 0.5,
-                       lid_off + wall + cardkb_pos_y + cardkb_wid - 1,
+            translate([lid_off + wall + cardkb_pos_x - 1.0,
+                       lid_off + wall + cardkb_pos_y + cardkb_wid - 0.5,
                        lid_top_t])
-                cube([cardkb_len + 1, 1.5, kb_ledge_h]);
+                cube([cardkb_len + 2, 1.5, kb_ledge_h]);
 
             // Front ledge
-            translate([lid_off + wall + cardkb_pos_x - 0.5,
-                       lid_off + wall + cardkb_pos_y - 0.5,
+            translate([lid_off + wall + cardkb_pos_x - 1.0,
+                       lid_off + wall + cardkb_pos_y - 1.0,
                        lid_top_t])
-                cube([1.5, cardkb_wid + 1, kb_ledge_h]);
+                cube([1.5, cardkb_wid + 2, kb_ledge_h]);
 
             // Back ledge
-            translate([lid_off + wall + cardkb_pos_x + cardkb_len - 1,
-                       lid_off + wall + cardkb_pos_y - 0.5,
+            translate([lid_off + wall + cardkb_pos_x + cardkb_len - 0.5,
+                       lid_off + wall + cardkb_pos_y - 1.0,
                        lid_top_t])
-                cube([1.5, cardkb_wid + 1, kb_ledge_h]);
+                cube([1.5, cardkb_wid + 2, kb_ledge_h]);
 
             // ----------------------------------------------------------
             //  CardKB retention clips (four corners)
@@ -150,8 +156,10 @@ module top_lid() {
             // ----------------------------------------------------------
             //  Hinge knuckles  (lid gets knuckles 1, 3)
             // ----------------------------------------------------------
-            // Shift by lid_off so knuckles align with case knuckles
-            translate([lid_off, lid_off + case_ext_wid, 0])
+            // Shift by lid_off so knuckles align with case knuckles.
+            // Y = lid_off maps to Y = case_ext_wid after assembly
+            // (the 180° flip inverts Y).
+            translate([lid_off, lid_off, 0])
             for (i = [1, 3]) {
                 xp = hinge_margin + i * (hinge_knuckle_l + hinge_gap);
                 barrel_r = hinge_barrel_d / 2;
@@ -161,8 +169,9 @@ module top_lid() {
                             rotate([0, 90, 0])
                                 cylinder(d = hinge_barrel_d,
                                          h = hinge_knuckle_l, $fn = 24);
-                            // Arm toward lid body (-Y)
-                            translate([0, -hinge_arm_t, -barrel_r])
+                            // Arm toward lid body (+Y local = toward
+                            // case interior after 180° assembly flip)
+                            translate([0, 0, -barrel_r])
                                 cube([hinge_knuckle_l, hinge_arm_t,
                                       barrel_r]);
                         }
