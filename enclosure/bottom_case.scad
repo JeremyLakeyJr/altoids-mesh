@@ -208,7 +208,7 @@ module bottom_case() {
         translate([wall + batt_pos_x + batt_len,
                    case_ext_wid - wall - 0.1,
                    floor_t])
-            cube([10, wall + 0.2, 5]);
+            cube([wire_slot_w, wall + 0.2, wire_slot_h]);
 
         // Heltec mounting screw holes (blind — do not penetrate floor).
         // Holes run from the inner floor surface up through each

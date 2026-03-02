@@ -133,6 +133,8 @@ screw_boss_d = 6.0;   // Boss outer diameter
 usbc_cut_w     = heltec_usbc_w + tolerance * 2;
 usbc_cut_h     = heltec_usbc_h + tolerance * 2;
 antenna_cut_d  = heltec_antenna_dia + tolerance * 2;
+wire_slot_w    = 10.0;    // Wire routing slot width
+wire_slot_h    = 5.0;     // Wire routing slot height
 
 // =====================================================================
 // 12. INTERNAL ANTENNA HOUSING
